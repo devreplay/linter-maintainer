@@ -1,6 +1,6 @@
 {
   "name": "zenlint",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Fix lint configuration from history",
   "bin": {
     "zenlint": "./bin/zenlint"
