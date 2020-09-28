@@ -14,12 +14,6 @@
       "sourceMap": false,
       "target": "es5",
       "lib": ["es6"],
-      "outDir": "../lib",
-      "resolveJsonModule": true
-  },
-  "include": [
-    "**/*.ts",
-    "**/*.json"
-  ],
-  "exclude": ["node_modules"]
+      "outDir": "../lib"
+  }
 }
