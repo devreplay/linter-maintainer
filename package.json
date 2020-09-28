@@ -31,7 +31,9 @@
     "eslint-config-standard-with-typescript": "^19.0.1",
     "eslint-plugin-jsdoc": "^30.5.1",
     "simple-git": "2.20.1",
-    "text-table": "0.2.0"
+    "text-table": "0.2.0",
+    "v8-compile-cache": "^2.1.1",
+    "lodash": "^4.17.19"
   },
   "devDependencies": {
     "@types/eslint": "^7.2.2",
