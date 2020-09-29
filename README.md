@@ -80,6 +80,7 @@ jobs:
 
 3. Push your source code on the GitHub
 4. Check `Actions` button on your GitHub project
+5. You'll get warnings [example](https://github.com/devreplay/devreplay-actions/actions/runs/277820912)
 
 
 ## Tool support plan
