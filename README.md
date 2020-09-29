@@ -18,8 +18,21 @@ zenlint --generate ./your/project/path
 If you want to get recommended rules
 
 ```sh
-zenlint ./your/project/path
+$ zenlint ./your/project/path
+
+Available  unicode-bom
+Available  valid-jsdoc
+Available  wrap-iife
+Available  wrap-regex
+Available  yield-star-spacing
+Available  yoda
+Ignored    no-undef
+Ignored    no-fallthrough
+Ignored    no-sparse-arrays
+Ignored    no-redeclare
+157 rules are available 4 rules are ignored 
 ```
+
 
 ## Tool support plan
 * JavaScript/TypeScript

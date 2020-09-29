@@ -269,6 +269,7 @@ function makeRuleResultStr(added: string[], deleted: string[]): string {
   added = added.filter(x => x != undefined)
   for (const addedRule of added) {
     outputTable.push([
+      'warning',
       'Available',
       addedRule
     ])
@@ -277,6 +278,7 @@ function makeRuleResultStr(added: string[], deleted: string[]): string {
   deleted = deleted.filter(x => x != undefined)
   for (const deletedRule of deleted) {
     outputTable.push([
+      'warning',
       'Ignored',
       deletedRule
     ])
