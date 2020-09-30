@@ -269,18 +269,16 @@ function makeRuleResultStr(added: string[], deleted: string[]): string {
   added = added.filter(x => x != undefined)
   for (const addedRule of added) {
     outputTable.push([
-      'warning',
-      'Available',
-      addedRule
+      'error',
+      `${addedRule} is available it should be added to eslintrc`,
     ])
   }
 
   deleted = deleted.filter(x => x != undefined)
   for (const deletedRule of deleted) {
     outputTable.push([
-      'warning',
-      'Ignored',
-      deletedRule
+      'error',
+      `${deletedRule} is ignored it should be removed from eslintrc`
     ])
   }
 
