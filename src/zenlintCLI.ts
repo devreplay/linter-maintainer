@@ -172,9 +172,12 @@ const cli = {
           const content = `${JSON.stringify(config, undefined, 2)}\n`;
           fs.writeFileSync(path.join(targetProject, '.eslintrc.json'), content, "utf-8")
           console.log(`Success to generate ${path.join(targetProject, '.eslintrc.json')}`)
-        } else {
-          console.log(makeRuleResultStr(hiddenRules, configuredWarnings))
+          return 0
         }
+        console.log(makeRuleResultStr(hiddenRules, configuredWarnings))
+        // TODO
+        const results_length = hiddenRules.length + configuredWarnings.length
+        return results_length === 0 ? 0 : 1;
       }
     }
     return 0
