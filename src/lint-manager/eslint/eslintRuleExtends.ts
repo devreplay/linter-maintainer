@@ -1,49 +1,49 @@
-import { CLIEngine, Linter } from 'eslint'
+import { CLIEngine, Linter } from 'eslint';
 
 export const ESRecommended = [
   'eslint:recommended'
-]
+];
 
 export const ESAll = [
   'eslint:all'
-]
+];
 
 export const ESStandard = [
   'standard'
-]
+];
 
 export const TSRecommended = [
   'eslint:recommended',
   'plugin:@typescript-eslint/recommended'
-]
+];
 
 export const TSAll = [
   'eslint:all',
   'plugin:@typescript-eslint/all'
-]
+];
 
 export const TSStandard = [
   'standard-with-typescript'
-]
+];
 
 export function selectExtends (isTS?: boolean, isAll?: boolean, isStandard?: boolean): string[] {
   if (isTS === true) {
     if (isAll === true) {
-      return TSAll
+      return TSAll;
     }
     if (isStandard === true) {
-      return TSStandard
+      return TSStandard;
     }
-    return TSRecommended
+    return TSRecommended;
   }
 
   if (isAll === true) {
-    return ESAll
+    return ESAll;
   }
   if (isStandard === true) {
-    return ESStandard
+    return ESStandard;
   }
-  return ESRecommended
+  return ESRecommended;
 }
 
 export function getRulesFromExtends (extendsName: string | string[], projectPath: string): {
@@ -67,15 +67,15 @@ export function getRulesFromExtends (extendsName: string | string[], projectPath
       ecmaVersion: 2018,
       sourceType: 'module'
     }
-  }
+  };
 
-  const engine = new CLIEngine({ baseConfig: config, useEslintrc: false })
-  const rules = engine.getRules()
-  const ruleIds: string[] = []
+  const engine = new CLIEngine({ baseConfig: config, useEslintrc: false });
+  const rules = engine.getRules();
+  const ruleIds: string[] = [];
   rules.forEach((_rule, key) => {
     // if (all || rule.meta?.docs?.recommended){
-    ruleIds.push(key)
+    ruleIds.push(key);
     // }
-  })
-  return { engine, ruleIds }
+  });
+  return { engine, ruleIds };
 }

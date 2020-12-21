@@ -1,9 +1,9 @@
 {
-  "name": "zenlint",
-  "version": "0.1.11",
+  "name": "linter-maintainer",
+  "version": "0.1.2",
   "description": "Fix lint configuration from history",
   "bin": {
-    "zenlint": "./bin/zenlint"
+    "linter-maintainer": "./bin/linter-maintainer"
   },
   "main": "./lib/index.js",
   "typings": "./lib/index.d.ts",
@@ -12,62 +12,60 @@
     "create": "npm run build && npm run test",
     "compile": "tsc -p src",
     "publish:local": "sh ./scripts/npmPublish.sh",
-    "evaluate": "node ./bin/zenlint --evaluate",
-    "test": "node ./bin/zenlint .",
-    "test:make": "node ./bin/zenlint --generate ./",
-    "test:standard": "node ./bin/zenlint --standard",
-    "test:esall": "node ./bin/zenlint --all",
+    "evaluate": "node ./bin/linter-maintainer --evaluate",
+    "test": "node ./bin/linter-maintainer .",
+    "test:make": "node ./bin/linter-maintainer --generate ./",
+    "test:standard": "node ./bin/linter-maintainer --standard",
+    "test:esall": "node ./bin/linter-maintainer --all",
     "test:all_js": "npm run test && npm run test:standard && npm run test:esall",
-    "test:ts": "node ./bin/zenlint --typescript",
-    "test:tsstandard": "node ./bin/zenlint  --typescript --standard",
-    "test:tsesall": "node ./bin/zenlint  --typescript --all",
+    "test:ts": "node ./bin/linter-maintainer --typescript",
+    "test:tsstandard": "node ./bin/linter-maintainer  --typescript --standard",
+    "test:tsesall": "node ./bin/linter-maintainer  --typescript --all",
     "refresh": "rm -rf ./node_modules ./package-lock.json && npm install",
     "verify": "npm-run-all clean compile"
   },
   "dependencies": {
-    "commander": "6.1.0",
+    "commander": "6.2.1",
     "csv": "^5.3.2",
-    "csv-writer": "1.6.0",
+    "csv-writer": "^1.6.0",
     "eslint-config-standard-with-typescript": "^19.0.1",
-    "eslint-plugin-jsdoc": "^30.5.1",
-    "simple-git": "2.20.1",
-    "text-table": "0.2.0",
-    "v8-compile-cache": "^2.1.1",
-    "lodash": "^4.17.19"
+    "eslint-plugin-jsdoc": "^30.7.9",
+    "simple-git": "2.31.0",
+    "text-table": "0.2.0"
   },
   "devDependencies": {
-    "@types/eslint": "^7.2.2",
-    "@types/node": "^14.6.4",
+    "@types/eslint": "^7.2.6",
+    "@types/node": "^14.14.14",
     "@types/rimraf": "^3.0.0",
-    "@types/sarif": "^2.1.2",
+    "@types/sarif": "^2.1.3",
     "@types/text-table": "^0.2.1",
-    "@typescript-eslint/eslint-plugin": "^4.2.0",
-    "@typescript-eslint/parser": "^4.2.0",
-    "eslint": "^7.10.0",
-    "eslint-config-standard": "^14.1.1",
-    "eslint-plugin-import": "^2.22.0",
+    "@typescript-eslint/eslint-plugin": "^4.10.0",
+    "@typescript-eslint/parser": "^4.10.0",
+    "eslint": "^7.16.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.1",
+    "eslint-plugin-standard": "^5.0.0",
     "npm-run-all": "^4.1.5",
     "rimraf": "^3.0.2",
-    "typescript": "^4.0.2"
+    "typescript": "^4.1.3"
   },
   "engines": {
     "node": ">=10.15.0"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/Ikuyadeu/zenlint.git"
+    "url": "git://github.com/devreplay/rule-ruler.git"
   },
   "keywords": [
     "lint"
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Ikuyadeu/zenlint/issues"
+    "url": "https://github.com/devreplay/rule-ruler/issues"
   },
-  "homepage": "https://github.com/Ikuyadeu/zenlint#readme",
+  "homepage": "https://github.com/devreplay/rule-ruler#readme",
   "author": "Yuki Ueda",
   "private": false
 }

@@ -1,11 +1,11 @@
-# Zenlint that make lint file automatically
+# Linter-Maintainer that make lint file automatically
  
 ## Usage
 
 ### 1. Install
 
 ```sh
-npm install -g zenlint
+npm install -g linter-maintainer
 ```
 
 ### 2. Execute
@@ -13,13 +13,13 @@ npm install -g zenlint
 #### 3.1 If you want to generate configfile such as `.eslintrc.json`
 
 ```sh
-zenlint --generate ./your/project/path
+linter-maintainer --generate ./your/project/path
 ```
 
 #### 3.2 If you want to get recommended rules
 
 ```sh
-$ zenlint ./your/project/path
+$ linter-maintainer ./your/project/path
 
 Available  unicode-bom
 Available  valid-jsdoc
@@ -36,10 +36,10 @@ Ignored    no-redeclare
 
 #### 3.2 If you want to check rules by pull request
 
-1. make `.github/workflows/zenlint.yml` on your project
+1. make `.github/workflows/linter-maintainer.yml` on your project
 
 ```yml
-name: "Zenlint test"
+name: "Linter-Maintainer test"
 on: # rebuild any PRs and main branch changes
   pull_request:
   push:
@@ -50,22 +50,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: npm install zenlint
+      - run: npm install linter-maintainer
       - uses: actions/setup-node@v1
         with:
           node-version: "12.x"
-      - run: echo "::add-matcher::.github/zenlint-match.json"   
-      - name: Run zenlint
-        run: node_modules/.bin/zenlint ./src
+      - run: echo "::add-matcher::.github/linter-maintainer-match.json"   
+      - name: Run linter-maintainer
+        run: node_modules/.bin/linter-maintainer ./src
 ```
 
-2. make `.github/zenlint-match.json`
+2. make `.github/linter-maintainer-match.json`
 
 ```json
 {
     "problemMatcher": [
         {
-            "owner": "zenlint",
+            "owner": "linter-maintainer",
             "pattern": [
                 {
                     "regexp": "^(warning|error)\\s+((Available|Ignored)\\s+(.+))",

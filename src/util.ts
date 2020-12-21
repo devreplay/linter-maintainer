@@ -1,21 +1,21 @@
-import * as fs from 'fs'
+import * as fs from 'fs';
 import path = require('path');
 
 export function makeCommonRules (rules1: string[], rules2: string[]): string[] {
-  const originalSet = new Set(rules1)
-  const diff = new Set([...rules2].filter(x => originalSet.has(x)))
-  return Array.from(diff)
+  const originalSet = new Set(rules1);
+  const diff = new Set([...rules2].filter(x => originalSet.has(x)));
+  return Array.from(diff);
 }
 
 export function makeUncommonRules (availableRules: string[], warnedRules: string[]): string[] {
-  const warnedSet = new Set(warnedRules)
-  const diff = new Set([...availableRules].filter(x => !warnedSet.has(x)))
-  return Array.from(diff)
+  const warnedSet = new Set(warnedRules);
+  const diff = new Set([...availableRules].filter(x => !warnedSet.has(x)));
+  return Array.from(diff);
 }
 
 export function exists (file: string): boolean {
-  const stat = fs.statSync(file)
-  return stat.isFile()
+  const stat = fs.statSync(file);
+  return stat.isFile();
 }
 
 export function getAllFiles(dirName: string): string[] {

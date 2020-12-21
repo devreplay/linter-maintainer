@@ -1,6 +1,7 @@
-import * as gitminer from './gitminer'
-import { SplitedRules, outputRuleResultTable } from './rules'
-import * as extend from './ruleExtends'
-import * as eslint_manager from './esint_manager'
-import * as util from './util'
-export {gitminer, SplitedRules, outputRuleResultTable, extend, eslint_manager, util}
+
+import * as gitminer from './gitminer';
+import { RuleMap, outputRuleResultTable } from './lint-manager/rules';
+import * as extend from './lint-manager/eslint/eslintRuleExtends';
+import * as eslint_manager from './lint-manager/eslint/esint';
+import * as util from './util';
+export {gitminer, RuleMap as SplitedRules, outputRuleResultTable, extend, eslint_manager, util};
