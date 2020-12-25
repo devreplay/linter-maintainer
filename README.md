@@ -1,5 +1,7 @@
-# Linter-Maintainer that make lint file automatically
+# Linter-Maintainer
  
+Suitable the linters for your style
+
 ## Usage
 
 ### 1. Install
@@ -21,20 +23,26 @@ linter-maintainer --generate ./your/project/path
 ```sh
 $ linter-maintainer ./your/project/path
 
-Available  unicode-bom
-Available  valid-jsdoc
-Available  wrap-iife
-Available  wrap-regex
-Available  yield-star-spacing
-Available  yoda
-Ignored    no-undef
-Ignored    no-fallthrough
-Ignored    no-sparse-arrays
-Ignored    no-redeclare
-157 rules are available 4 rules are ignored 
+error  symbol-description is available it should be added to eslintrc
+error  template-curly-spacing is available it should be added to eslintrc
+error  template-tag-spacing is available it should be added to eslintrc
+error  unicode-bom is available it should be added to eslintrc
+error  valid-jsdoc is available it should be added to eslintrc
+error  wrap-iife is available it should be added to eslintrc
+error  wrap-regex is available it should be added to eslintrc
+error  yield-star-spacing is available it should be added to eslintrc
+error  yoda is available it should be added to eslintrc
+error  no-fallthrough is ignored it should be removed from eslintrc
+error  no-redeclare is ignored it should be removed from eslintrc
+error  no-sparse-arrays is ignored it should be removed from eslintrc
+error  no-undef is ignored it should be removed from eslintrc
+error  no-unused-vars is ignored it should be removed from eslintrc
+
+157 rules are available 5 rules are ignored 
+Total: 162
 ```
 
-#### 3.2 If you want to check rules by pull request
+#### 3.3 If you want to check rules by pull request
 
 1. make `.github/workflows/linter-maintainer.yml` on your project
 
@@ -86,6 +94,9 @@ jobs:
 ## Tool support plan
 * JavaScript/TypeScript
     * [x] ESLint (Also standard js is supported by eslint)
+* Java
+    * [ ] Pmd
+    * [ ] CheckStyle
 * Python
     * [ ] pylint
     * [ ] flake8
@@ -93,4 +104,3 @@ jobs:
 * Ruby
     * [ ] rubocop
 * YAML
-    * [ ] yamlint
