@@ -46,7 +46,7 @@ export class RuleMap {
     return (this.followed.length - this.getFalseNegative().length) / this.followed.length;
   }
 
-  outputSummary (): void {
+  outputSummary (): string {
     const lintOuputs: string[][] = [];
 
     lintOuputs.push(['Followed', this.followed.length.toString()]);
@@ -55,14 +55,47 @@ export class RuleMap {
     lintOuputs.push(['Configured', this.enabled.length.toString()]);
     lintOuputs.push(['Unconfigured', this.disabled.length.toString()]);
 
-    lintOuputs.push(['False Positive', this.getFalsePositive.length.toString()]);
-    lintOuputs.push(['False Negative', this.getFalseNegative.length.toString()]);
+    lintOuputs.push(['False Positive', this.getFalsePositive().length.toString()]);
+    lintOuputs.push(['False Negative', this.getFalseNegative().length.toString()]);
 
     lintOuputs.push(['Accuracy', this.getAcurracy().toFixed(3)]);
     lintOuputs.push(['Coverage', this.getCoverage().toFixed(3)]);
     const output = table(lintOuputs);
-    console.log();
-    console.log(output);
+    
+    return output;
+  }
+
+  makeAddRemovedSummary(): string {
+    const outputTable: string[][] = [];
+
+    const FN = this.getFalseNegative();
+    for (const addedRule of FN) {
+      outputTable.push([
+        'error',
+        `${addedRule} is available it should be added to eslintrc`,
+      ]);
+    }
+
+    const FP = this.getFalsePositive();
+    for (const deletedRule of FP) {
+      outputTable.push([
+        'error',
+        `${deletedRule} is ignored it should be removed from eslintrc`
+      ]);
+    }
+  
+    let output = table(outputTable);
+
+    const addedRules = FN.length;
+    const deletedRules = FP.length;
+    const total = addedRules + deletedRules;
+    const summary = [
+      `\n\n${addedRules} rules are available`,
+      `${deletedRules} rules are ignored`,
+      `Total: ${total}`,
+    ];
+    output += summary.join('\n');
+    return output;
   }
 }
 

@@ -1,5 +1,4 @@
 import * as commander from 'commander';
-import * as table from 'text-table';
 import { makeFileWarnings } from './projectBench';
 import { ESLintManager } from './lint-manager/eslint/esint-js';
 
@@ -128,7 +127,7 @@ const cli = {
           const ruleMap = lintManager.makeRuleMap();
           const hiddenRules = ruleMap.getFalseNegative();
           const unwantedRules = ruleMap.getFalsePositive();
-          console.log(makeRuleResultStr(hiddenRules, unwantedRules));
+          console.log(ruleMap.makeAddRemovedSummary());
           const results_length = hiddenRules.length + unwantedRules.length;
           return results_length === 0 ? 0 : 1;
         }
@@ -204,54 +203,5 @@ function optionParam (option: Option): string {
       return '';
   }
 }
-
-export function makeOptionStr (isTS?: boolean, isStandard?: boolean, isAll?: boolean): string {
-  let optionStr = '';
-  if (isTS === true) {
-    optionStr += '_ts';
-  }
-  if (isStandard === true) {
-    optionStr += '_standard';
-  }
-  if (isAll === true) {
-    optionStr += '_all';
-  }
-  return optionStr;
-}
-
-
-function makeRuleResultStr(added: string[], deleted: string[]): string {
-
-  const outputTable: string[][] = [];
-  added = added.filter(x => x !== undefined);
-  for (const addedRule of added) {
-    outputTable.push([
-      'error',
-      `${addedRule} is available it should be added to eslintrc`,
-    ]);
-  }
-
-  deleted = deleted.filter(x => x !== undefined);
-  for (const deletedRule of deleted) {
-    outputTable.push([
-      'error',
-      `${deletedRule} is ignored it should be removed from eslintrc`
-    ]);
-  }
-
-  let output = table(outputTable);
-
-  const addedRules = added.length;
-  const deletedRules = deleted.length;
-  const total = addedRules + deletedRules;
-  const summary = [
-    `\n\n${addedRules} rules are available`,
-    `${deletedRules} rules are ignored`,
-    `\nTotal: ${total}`,
-  ];
-  output += summary.join(' ');
-  return output;
-}
-
 
 module.exports = cli;
