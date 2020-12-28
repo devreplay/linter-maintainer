@@ -168,11 +168,11 @@ const versionSize = {
 };
 
 function makeTagDiffKind (tag_a: string, tag_b: string) {
-  // # 両方のタグがX.Y.Zの形になっているかチェック
-  // # なっていればXをメジャーバージョン 0
-  // # Yをマイナーバージョン: 1
-  // # Zをメンテナンスバージョン: 2
-  // 失敗なら-1
+  // Check tag is X.Y.Z and return diff of the version
+  // Major 0
+  // Minor 1
+  // Marintainance 2
+  // Fail -1
   const partsA = gitminer.parseTagVersion(tag_a);
   const partsB = gitminer.parseTagVersion(tag_b);
 
