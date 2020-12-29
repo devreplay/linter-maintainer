@@ -6,6 +6,7 @@
 // }
 // import { Result } from 'sarif';
 
+import { Result } from 'sarif';
 import { RuleMap } from './rules';
 
 export interface LintManager {
@@ -19,6 +20,11 @@ export interface LintManager {
     // execute(path: string, configFile?: string): Result[]
     // executeWithRules(path: string, ruleIds: string[]): Result[]
     getAvailableRules(): string[]
-    makeRuleMap(): RuleMap | undefined
-    outputConfigFile(): void
+    makeRuleMap(): Promise<RuleMap | undefined>
+    outputConfigFile(): Promise<void>
+}
+
+export function results2RuleMap(results: Result[]): RuleMap {
+    console.log(results[0].message);
+    return new RuleMap([], [], []);
 }

@@ -122,9 +122,9 @@ const cli = {
         const lintManager = new ESLintManager(targetProject);
 
         if (argv.generate) {
-          lintManager.outputConfigFile();
+          void lintManager.outputConfigFile();
         } else {
-          const ruleMap = lintManager.makeRuleMap();
+          const ruleMap = await lintManager.makeRuleMap();
           const hiddenRules = ruleMap.getFalseNegative();
           const unwantedRules = ruleMap.getFalsePositive();
           console.log(ruleMap.makeAddRemovedSummary());

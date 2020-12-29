@@ -48,7 +48,7 @@ export class ESLintManager implements LintManager {
         return rules.ruleIds;
     }
 
-    makeRuleMap (): RuleMap {
+    makeRuleMap (): Promise<RuleMap> {
         const typescript = false;
         const standard = false;
         const target_rules = extend.selectExtends(false, true, false);
@@ -66,12 +66,14 @@ export class ESLintManager implements LintManager {
           configured_rules = eslint_manager.getRulesFromExtends(defaultrules, this.projectPath, false, typescript);
         }
         const enabled_rules = configured_rules.ruleIds;
-
-        return new RuleMap(rules.ruleIds, enabled_rules, warnings);
+        const ruleMap = new RuleMap(rules.ruleIds, enabled_rules, warnings);
+        return new Promise<RuleMap>((resolve) => {
+            resolve(ruleMap);
+        });
     }
 
-    outputConfigFile (): void {
-        const ruleMap = this.makeRuleMap();
+    async outputConfigFile (): Promise<void> {
+        const ruleMap = await this.makeRuleMap();
         const config = eslint_manager.makeConfig(ruleMap.followed, this.projectPath, false);
         const content = `${JSON.stringify(config, undefined, 2)}\n`;
         fs.writeFileSync(path.join(this.projectPath, '.eslintrc.json'), content, 'utf-8');
