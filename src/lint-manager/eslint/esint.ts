@@ -164,8 +164,6 @@ function getConfigPath (projectPath: string): string|undefined {
     }
 
     return undefined;
-
-
 }
 
 export function compareConfig (currentRules: RuleMap, prevRules: RuleMap): RuleMap {

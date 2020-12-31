@@ -8,14 +8,9 @@ import * as eslint_manager from './esint';
 import * as extend from './eslintRuleExtends';
 import { getAllFiles } from '../../util';
 
-export class ESLintManager implements LintManager {
-    projectPath: string;
-    constructor (projectPath: string){
-        this.projectPath = projectPath;
-    }
-
-    execute (path: string, configFile?: string): Result[] {
-        console.log(path);
+export class ESLintManager extends LintManager {    
+    execute (projectPath: string, configFile?: string): Result[] {
+        console.log(projectPath);
         console.log(configFile);
         // https://github.com/github/super-linter/blob/156024e23187792ce8233ce93a194296fd70ca15/lib/linter.sh#L747
         const cmd = ['eslint', '--no-eslintrc', '-c', '${JAVASCRIPT_ES_LINTER_RULES}'];
