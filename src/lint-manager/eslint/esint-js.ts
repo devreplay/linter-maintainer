@@ -1,6 +1,4 @@
 import { Result } from 'sarif';
-import * as path from 'path';
-import * as fs from 'fs';
 
 import {RuleMap} from '../rule-map';
 import { LintManager } from '../lint-manager';
@@ -12,13 +10,9 @@ export class ESLintManager extends LintManager {
     execute (projectPath: string, configFile?: string): Result[] {
         console.log(projectPath);
         console.log(configFile);
-        // https://github.com/github/super-linter/blob/156024e23187792ce8233ce93a194296fd70ca15/lib/linter.sh#L747
         const cmd = ['eslint', '--no-eslintrc', '-c', '${JAVASCRIPT_ES_LINTER_RULES}'];
         console.log(cmd);
-        // "pylint --rcfile ${PYTHON_PYLINT_LINTER_RULES}"
-        // "flake8 --config=${PYTHON_FLAKE8_LINTER_RULES}"
-        // "black --config ${PYTHON_BLACK_LINTER_RULES} --diff --check"
-        // "java -jar /usr/bin/checkstyle -c ${JAVA_LINTER_RULES}"
+
         
         // すべてのルールを取得
         const rules = this.getAvailableRules();
@@ -67,11 +61,10 @@ export class ESLintManager extends LintManager {
         });
     }
 
-    async outputConfigFile (): Promise<void> {
+    async makeConfigFile (): Promise<string> {
         const ruleMap = await this.makeRuleMap();
         const config = eslint_manager.makeConfig(ruleMap.followed, this.projectPath, false);
         const content = `${JSON.stringify(config, undefined, 2)}\n`;
-        fs.writeFileSync(path.join(this.projectPath, '.eslintrc.json'), content, 'utf-8');
-        console.log(`Success to generate ${path.join(this.projectPath, '.eslintrc.json')}`);
+        return content;
     }
 }

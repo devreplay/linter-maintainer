@@ -4,8 +4,6 @@ import { Options } from 'csv-parse';
 import { EOL } from 'os';
 import { exec } from 'child_process';
 import { Result } from 'sarif';
-import * as path from 'path';
-import * as fs from 'fs';
 
 import { LintManager } from '../lint-manager';
 import { RuleMap } from '../rule-map';
@@ -88,7 +86,7 @@ function readConfig(xmlPath:string): PmdConfig {
         const jsonObj = xmlparse(contents, options) as PmdConfig;
         return jsonObj;
       } catch (error) {
-        console.log(error);
+        console.error(error);
         throw new Error(
           'Failed to parse PMD Config.'
         );
@@ -154,7 +152,7 @@ export class PMDManager extends LintManager {
     const pmdCmd = exec(cmd.join(' '), {});
     const pmdPromise = new Promise<Result[]>((resolve, reject) => {
       pmdCmd.addListener('error', (e) => {
-        console.log(e);
+        console.error(e);
         reject(e);
       });
       pmdCmd.addListener('exit', () => {
@@ -189,7 +187,7 @@ export class PMDManager extends LintManager {
     return new RuleMap(this.getAvailableRules(), unfollowed, enabled.map(x => makeShortRuleID(x)));
   }
   
-  async outputConfigFile(): Promise<void> {
+  async makeConfigFile(): Promise<string> {
     const ruleMap = await this.makeRuleMap();
     if (ruleMap !== undefined) {
       const head = [
@@ -203,9 +201,10 @@ export class PMDManager extends LintManager {
       const tail = '</ruleset>';     
 
       const content = [...head, ...rules, tail].join('\n');
-      const pmdPath = path.join(this.projectPath, 'yourpmd.xml');
-      fs.writeFileSync(pmdPath, content, 'utf-8');
-      console.log(`Success to generate ${pmdPath}`);
+      return content;
     }
+    throw new Error(
+      'Failed to generate PMD Config'
+    );
   }
 }

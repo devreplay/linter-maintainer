@@ -90,7 +90,8 @@ const cli = {
     }
 
     if (argv.generate) {
-      void lintManager.outputConfigFile();
+      const configContent = await lintManager.makeConfigFile();
+      console.log(configContent);
     } else {
       const ruleMap = await lintManager.makeRuleMap();
       if (ruleMap === undefined) {

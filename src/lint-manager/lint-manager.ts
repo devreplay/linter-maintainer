@@ -24,7 +24,7 @@ export abstract class LintManager {
     // executeWithRules(path: string, ruleIds: string[]): Result[]
     abstract getAvailableRules(): string[];
     abstract makeRuleMap(): Promise<RuleMap | undefined>;
-    abstract outputConfigFile(): Promise<void>;
+    abstract makeConfigFile(): Promise<string>;
 
     results2warnings(results: Result[]): string[] {
         const newresult = [];
