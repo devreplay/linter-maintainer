@@ -1,20 +1,21 @@
 import * as commander from 'commander';
-import { makeFileWarnings } from './projectBench';
+import { LintManager } from './lint-manager/lintManager';
 import { ESLintManager } from './lint-manager/eslint/esint-js';
+import { PMDManager } from './lint-manager/pmd/pmd-java8';
 
 interface Argv {
-  typescript?: boolean
+  eslintJs?: boolean
+  eslintTs?: boolean
   standard?: boolean
-  all?: boolean
+  pmdJava?: boolean
   evaluate?: boolean
-  evaluate2?: boolean
   generate?: boolean
 }
 
 interface Option {
   short?: string
   // Commander will camelCase option names.
-  name: keyof Argv | 'typescript' | 'standard' | 'all' | 'evaluate' | 'evaluate2' | 'generate'
+  name: keyof Argv | 'eslint-js' | 'eslint-ts' | 'standard' | 'pmd-java' | 'generate'
   type: 'string' | 'boolean' | 'array'
   describe: string // Short, used for usage message
   description: string // Long, used for `--help`
@@ -22,40 +23,34 @@ interface Option {
 
 const options: Option[] = [
   {
-    name: 'typescript',
+    name: 'eslint-js',
     type: 'boolean',
-    describe: 'target typescript files',
-    description: 'target typescript files'
+    describe: 'Use ESlint for JS',
+    description: 'Use ESlint for JavaScript files'
+  },
+  {
+    name: 'eslint-ts',
+    type: 'boolean',
+    describe: 'Use ESLint for TS',
+    description: 'Use ESLint for TypeScript files'
   },
   {
     name: 'standard',
     type: 'boolean',
-    describe: 'target the directory files',
-    description: 'target the directory files'
+    describe: 'Use standardjs',
+    description: 'Use standardjs the directory files'
   },
   {
-    name: 'all',
+    name: 'pmd-java',
     type: 'boolean',
-    describe: 'make pattern from two files',
-    description: 'make pattern from two files'
-  },
-  {
-    name: 'evaluate',
-    type: 'boolean',
-    describe: 'evaluate linter-maintainer on the target projects',
-    description: 'evaluate linter-maintainer on the target projects'
-  },
-  {
-    name: 'evaluate2',
-    type: 'boolean',
-    describe: 'evaluate2 linter-maintainer on the target projects',
-    description: 'evaluate2 linter-maintainer on the target projects'
+    describe: 'Use PMD for Java',
+    description: 'Use PMD for Java files'
   },
   {
     name: 'generate',
     type: 'boolean',
-    describe: 'generate .eslint.yml on the target projects',
-    description: 'generate .eslint.yml on the target projects'
+    describe: 'generate a config file',
+    description: 'generate a config file on the target projects'
   }
 ];
 
@@ -75,111 +70,41 @@ const cli = {
       (commander.parseArgs as (args: string[], unknown: string[]) => void)([], parsed.unknown);
     }
     const argv = commander.opts() as Argv;
-    if (!(args.length > 0) && !argv.evaluate) {
-        console.error('No pathes specified.');
+    if (args.length < 1) {
+        console.error('No target pathes specified.');
         return 2;
     }
-    const targetProjects = args;
+    const targetProject = args[0];
 
-    if (argv.evaluate) {
-      for (const targetProject of targetProjects) {
-        await makeFileWarnings(targetProject);
-      }
-    } 
-    // else if (argv.evaluate2) {
-    //   for (const targetProject of targetProjects) {
-    //     console.log(`\n*** Apply on the ${path.basename(targetProject)} ***`)
-    //     const project = new gitminer.Project(targetProject)
-  
-    //     await project.checkOutToHEAD()
-    //     let changedFiles = (await project.getChangedFilesWithHEAD(currentIndex, oldIndex))
-    //       .map(file => { return path.join(targetProject, file) })
-    //     let filteredFiles = filterFiles(changedFiles, argv.typescript)
-  
-    //     const ruleExtend = extend.selectExtends(argv.typescript, argv.all, argv.standard)
-    //     const allRules = eslint_manager.getRulesFromExtends(ruleExtend, targetProject, argv.all, argv.typescript)
-    //     const ruleSets = await eslint_manager.makeRuleSets(targetProject, filteredFiles, currentIndex, oldIndex)
-  
-    //     await project.checkOutToHEAD()
-    //     changedFiles = (await project.getChangedFilesWithHEAD(currentIndex))
-    //       .map(file => { return path.join(targetProject, file) })
-    //     filteredFiles = filterFiles(changedFiles, argv.typescript)
-  
-    //     const currentRules = eslint_manager.getRuleStatus(targetProject, filteredFiles, allRules)
-    //     // const currentRules = await getSlideRules(targetProject, currentIndex, filteredFiles, allRules)
-  
-    //     if (currentRules === undefined) {
-    //       continue
-    //     }
-  
-    //     currentResults.push(currentRules)
-    //     evaluateRuleSets(currentRules, ruleSets, targetProject)
-    //   }
-    // }
-    else{
-      // const target_rules = extend.selectExtends(argv.typescript, true, argv.standard);
-      for (const targetProject of targetProjects) {
-        const lintManager = new ESLintManager(targetProject);
+    let lintManager: LintManager;
+    if (argv.eslintJs) {
+      lintManager = new ESLintManager(targetProject);
+    } else if (argv.eslintTs) {
+      lintManager = new ESLintManager(targetProject);
+    } else if (argv.pmdJava) {
+      const pmdPath = args[1];
+      const configPath = args[2];
+      lintManager = new PMDManager(targetProject, pmdPath, configPath);
+    } else {
+      lintManager = new ESLintManager(targetProject);
+    }
 
-        if (argv.generate) {
-          void lintManager.outputConfigFile();
-        } else {
-          const ruleMap = await lintManager.makeRuleMap();
-          const hiddenRules = ruleMap.getFalseNegative();
-          const unwantedRules = ruleMap.getFalsePositive();
-          console.log(ruleMap.makeAddRemovedSummary());
-          const results_length = hiddenRules.length + unwantedRules.length;
-          return results_length === 0 ? 0 : 1;
-        }
+    if (argv.generate) {
+      void lintManager.outputConfigFile();
+    } else {
+      const ruleMap = await lintManager.makeRuleMap();
+      if (ruleMap === undefined) {
+        return 1;
       }
+      const hiddenRules = ruleMap.getFalseNegative();
+      const unwantedRules = ruleMap.getFalsePositive();
+      console.log(ruleMap.makeAddRemovedSummary());
+      const results_length = hiddenRules.length + unwantedRules.length;
+      return results_length === 0 ? 0 : 1;
     }
     return 0;
   }
 };
-
-// function evaluateRuleSets (currentRule: SplitedRules, rules: RuleIds, targetProject: string): void {
-//   const level: string[] = [
-//     'current',
-//     'all',
-//     'recommend',
-//     'standard',
-//     'benchmark',
-//     'approach'
-//   ]
-//   const result: SplitedRules[] = [currentRule]
-//   const allRule = new SplitedRules(currentRule.followed, currentRule.unfollowed, rules.all)
-//   result.push(allRule)
-
-//   const recommendRule = new SplitedRules(currentRule.followed, currentRule.unfollowed, rules.recommend)
-//   result.push(recommendRule)
-
-//   const standardRule = new SplitedRules(currentRule.followed, currentRule.unfollowed, rules.standard)
-//   result.push(standardRule)
-
-//   if (rules.benchmark !== undefined) {
-//     const benchmarkRule = new SplitedRules(currentRule.followed, currentRule.unfollowed, rules.benchmark)
-//     result.push(benchmarkRule)
-//   }
-
-//   if (rules.approach !== undefined) {
-//     const approachRule = new SplitedRules(currentRule.followed, currentRule.unfollowed, rules.approach)
-//     result.push(approachRule)
-//   }
-
-//   const currentCSV = `results/${path.basename(targetProject)}.csv`
-//   outputRuleResultTable(result, level, currentCSV)
-// }
-
-export function filterFiles (files: string[], isTS?: boolean): string[] {
-  const tsPath = '.ts';
-  const jsPath = '.js';
-
-  if (isTS === true) {
-    return files.filter(file => { return file.endsWith(tsPath); });
-  } else {
-    return files.filter(file => { return file.endsWith(jsPath); });
-  }
-}
 
 function collect (val: string, memory: string[]): string[] {
   memory.push(val);
