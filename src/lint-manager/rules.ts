@@ -72,7 +72,7 @@ export class RuleMap {
     for (const addedRule of FN) {
       outputTable.push([
         'error',
-        `${addedRule} is available it should be added to eslintrc`,
+        `${addedRule} is available it should be added`,
       ]);
     }
 
@@ -80,7 +80,7 @@ export class RuleMap {
     for (const deletedRule of FP) {
       outputTable.push([
         'error',
-        `${deletedRule} is ignored it should be removed from eslintrc`
+        `${deletedRule} is ignored it should be removed`
       ]);
     }
   
