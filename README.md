@@ -23,20 +23,20 @@ linter-maintainer --generate ./your/project/path
 ```sh
 $ linter-maintainer ./your/project/path
 
-error  symbol-description is available it should be added to eslintrc
-error  template-curly-spacing is available it should be added to eslintrc
-error  template-tag-spacing is available it should be added to eslintrc
-error  unicode-bom is available it should be added to eslintrc
-error  valid-jsdoc is available it should be added to eslintrc
-error  wrap-iife is available it should be added to eslintrc
-error  wrap-regex is available it should be added to eslintrc
-error  yield-star-spacing is available it should be added to eslintrc
-error  yoda is available it should be added to eslintrc
-error  no-fallthrough is ignored it should be removed from eslintrc
-error  no-redeclare is ignored it should be removed from eslintrc
-error  no-sparse-arrays is ignored it should be removed from eslintrc
-error  no-undef is ignored it should be removed from eslintrc
-error  no-unused-vars is ignored it should be removed from eslintrc
+error  symbol-description is available it should be added
+error  template-curly-spacing is available it should be added
+error  template-tag-spacing is available it should be added
+error  unicode-bom is available it should be added
+error  valid-jsdoc is available it should be added
+error  wrap-iife is available it should be added
+error  wrap-regex is available it should be added
+error  yield-star-spacing is available it should be added
+error  yoda is available it should be added
+error  no-fallthrough is ignored it should be removed
+error  no-redeclare is ignored it should be removed
+error  no-sparse-arrays is ignored it should be removed
+error  no-undef is ignored it should be removed
+error  no-unused-vars is ignored it should be removed
 
 157 rules are available 5 rules are ignored 
 Total: 162
