@@ -7,8 +7,8 @@ import { Result } from 'sarif';
 import * as path from 'path';
 import * as fs from 'fs';
 
-import { LintManager } from '../lintManager';
-import { RuleMap } from '../rules';
+import { LintManager } from '../lint-manager';
+import { RuleMap } from '../rule-map';
 import { allRule, makeFullRuleID, makeShortRuleID } from './pmd-java8-rules';
 import { tryReadFile } from '../../util';
 
@@ -138,33 +138,6 @@ function makePMDCommand(dirName: string, pmdPath: string) {
   return  [pmdPath, '-d', dirName, '-f', 'csv', '-rulesets', PMD_CATEGORY.join(',')];
 }
 
-function execute (cmd: string[]) {
-  let result: Result[] = [];
-  const pmdCmd = exec(cmd.join(' '), {});
-  const pmdPromise = new Promise<Result[]>((resolve, reject) => {
-    pmdCmd.addListener('error', (e) => {
-      console.log(e);
-      reject(e);
-    });
-    pmdCmd.addListener('exit', () => {
-      resolve(result);
-    });
-
-    pmdCmd.stdout?.on('data', (stdout: string) => {
-      const output = parsePmdCsv(stdout);
-      result = pmdJson2Sarif(output);
-    });
-    if (pmdCmd.stderr) {
-      pmdCmd.stderr.on('data', (m: string) => {
-        console.error(`error: ${m}`);
-      });
-    }
-    
-  });
-
-  return pmdPromise;
-}
-
 
 export class PMDManager extends LintManager {
   pmdPath: string;
@@ -175,13 +148,41 @@ export class PMDManager extends LintManager {
     this.pmdPath = pmdPath? pmdPath: 'pmd';
     this.configPath = configPath;
   }
+
+  execute (cmd: string[]): Promise<Result[]> {
+    let result: Result[] = [];
+    const pmdCmd = exec(cmd.join(' '), {});
+    const pmdPromise = new Promise<Result[]>((resolve, reject) => {
+      pmdCmd.addListener('error', (e) => {
+        console.log(e);
+        reject(e);
+      });
+      pmdCmd.addListener('exit', () => {
+        resolve(result);
+      });
+  
+      pmdCmd.stdout?.on('data', (stdout: string) => {
+        const output = parsePmdCsv(stdout);
+        result = pmdJson2Sarif(output);
+      });
+      if (pmdCmd.stderr) {
+        pmdCmd.stderr.on('data', (m: string) => {
+          console.error(`error: ${m}`);
+        });
+      }
+      
+    });
+  
+    return pmdPromise;
+  }
+
   getAvailableRules(): string[] {
     return allRule;
   }
   
   async makeRuleMap(): Promise<RuleMap | undefined> {
     const command = makePMDCommand(this.projectPath, this.pmdPath);
-    const results = await execute(command);
+    const results = await this.execute(command);
 
     const unfollowed = this.results2warnings(results);
     const enabled = this.configPath? collectRuleIdfromXML(this.configPath): [];
@@ -189,18 +190,17 @@ export class PMDManager extends LintManager {
   }
   
   async outputConfigFile(): Promise<void> {
-    const head = ['<?xml version="1.0"?>',
-    '<ruleset name="yourrule"',
-    'xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"',
-    'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',
-    'xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">',
-  '<description>Your configuration of PMD. Includes the rules that are most likely to apply for you.</description>'];
-    const tail = '</ruleset>';
-
     const ruleMap = await this.makeRuleMap();
     if (ruleMap !== undefined) {
-     
+      const head = [
+        '<?xml version="1.0"?>',
+        '<ruleset name="yourrule"',
+        'xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"',
+        'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',
+        'xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">',
+        '<description>Your configuration of PMD. Includes the rules that are most likely to apply for you.</description>'];
       const rules = ruleMap.followed.map(x => `<rule ref="${makeFullRuleID(x)}"/>`);
+      const tail = '</ruleset>';     
 
       const content = [...head, ...rules, tail].join('\n');
       const pmdPath = path.join(this.projectPath, 'yourpmd.xml');

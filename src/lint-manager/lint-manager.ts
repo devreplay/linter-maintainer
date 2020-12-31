@@ -7,7 +7,7 @@
 // import { Result } from 'sarif';
 
 import { Result } from 'sarif';
-import { RuleMap } from './rules';
+import { RuleMap } from './rule-map';
 
 export abstract class LintManager {
     // 設定ファイルを取得する

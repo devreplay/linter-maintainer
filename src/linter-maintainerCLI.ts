@@ -1,5 +1,5 @@
 import * as commander from 'commander';
-import { LintManager } from './lint-manager/lintManager';
+import { LintManager } from './lint-manager/lint-manager';
 import { ESLintManager } from './lint-manager/eslint/esint-js';
 import { PMDManager } from './lint-manager/pmd/pmd-java8';
 

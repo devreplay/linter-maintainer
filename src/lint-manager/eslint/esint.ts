@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import * as gitminer from '../../gitminer';
-import {RuleMap} from '../rules';
+import {RuleMap} from '../rule-map';
 import {exists} from '../../util';
 
 export type Rules = {

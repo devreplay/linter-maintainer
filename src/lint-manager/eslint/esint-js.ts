@@ -2,10 +2,10 @@ import { Result } from 'sarif';
 import * as path from 'path';
 import * as fs from 'fs';
 
-import {RuleMap} from '../rules';
-import { LintManager } from '../lintManager';
+import {RuleMap} from '../rule-map';
+import { LintManager } from '../lint-manager';
 import * as eslint_manager from './esint';
-import * as extend from './eslintRuleExtends';
+import * as extend from './eslint-rule-extends';
 import { getAllFiles } from '../../util';
 
 export class ESLintManager extends LintManager {    
