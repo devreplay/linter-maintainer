@@ -15,13 +15,13 @@ npm install -g linter-maintainer
 #### 3.1 If you want to generate configfile such as `.eslintrc.json`
 
 ```sh
-linter-maintainer --generate ./your/project/path
+linter-maintainer --generate --eslint-js ./your/project/path
 ```
 
 #### 3.2 If you want to get recommended rules
 
 ```sh
-$ linter-maintainer ./your/project/path
+$ linter-maintainer --eslint-js ./your/project/path
 
 error  symbol-description is available it should be added
 error  template-curly-spacing is available it should be added
@@ -92,15 +92,17 @@ jobs:
 
 
 ## Tool support plan
-* JavaScript/TypeScript
-    * [x] ESLint (Also standard js is supported by eslint)
-* Java
-    * [ ] Pmd
-    * [ ] CheckStyle
-* Python
-    * [ ] pylint
-    * [ ] flake8
-    * [ ] black
-* Ruby
-    * [ ] rubocop
-* YAML
+
+* ✅: Done
+* 🏃: Work in progress
+
+|Language|Tool|command|Validate Rule|Generate Rule|
+|---|---|---|---|---|
+|JavaScript|ESLint|--eslint-js| ✅ | ✅ |
+|JavaScript|StandardJS||  |  |
+|TypeScript|ESLint|--eslint-ts| 🏃 |  |
+|Java|PMD|--pmd-java| ✅ | ✅ |
+|Python|Pylint|||
+|Python|flake8|||
+|Python|black|||
+|Ruby|robocop|||
