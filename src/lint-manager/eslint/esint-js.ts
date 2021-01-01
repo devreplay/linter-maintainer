@@ -6,7 +6,12 @@ import * as eslint_manager from './esint';
 import * as extend from './eslint-rule-extends';
 import { getAllFiles } from '../../util';
 
-export class ESLintManager extends LintManager {    
+export class ESLintManager extends LintManager {
+    typescript = false;
+    constructor (projectPath: string, isTS: boolean){
+        super(projectPath);
+        this.typescript = isTS;
+    }
     async execute (cmd: string[]): Promise<Result[]> {
         console.log(cmd);
         
@@ -27,20 +32,18 @@ export class ESLintManager extends LintManager {
 
 
     getAvailableRules(): Promise<string[]> {
-        const typescript = false;
         const target_rules = extend.selectExtends(false, true, false);
-        const rules = eslint_manager.getRulesFromExtends(target_rules, this.projectPath, true, typescript);
+        const rules = eslint_manager.getRulesFromExtends(target_rules, this.projectPath, true, this.typescript);
         return new Promise<string[]>((resolve) => {
             resolve(rules.ruleIds);
         });
     }
 
     makeRuleMap (): Promise<RuleMap> {
-        const typescript = false;
         const standard = false;
         const target_rules = extend.selectExtends(false, true, false);
         const files = eslint_manager.filterFiles(getAllFiles(this.projectPath));
-        const rules = eslint_manager.getRulesFromExtends(target_rules, this.projectPath, true, typescript);
+        const rules = eslint_manager.getRulesFromExtends(target_rules, this.projectPath, true, this.typescript);
 
         const warnings = eslint_manager.executeESLint(files, rules.engine);
         
@@ -49,8 +52,8 @@ export class ESLintManager extends LintManager {
         try {
           configured_rules = eslint_manager.getRulesFromFile(this.projectPath);
         } catch (error) {
-          const defaultrules = extend.selectExtends(typescript, false, standard);
-          configured_rules = eslint_manager.getRulesFromExtends(defaultrules, this.projectPath, false, typescript);
+          const defaultrules = extend.selectExtends(this.typescript, false, standard);
+          configured_rules = eslint_manager.getRulesFromExtends(defaultrules, this.projectPath, false, this.typescript);
         }
         const enabled_rules = configured_rules.ruleIds;
         const ruleMap = new RuleMap(rules.ruleIds, enabled_rules, warnings);

@@ -85,9 +85,9 @@ const cli = {
 
     let lintManager: LintManager;
     if (argv.eslintJs) {
-      lintManager = new ESLintManager(targetProject);
+      lintManager = new ESLintManager(targetProject, false);
     } else if (argv.eslintTs) {
-      lintManager = new ESLintManager(targetProject);
+      lintManager = new ESLintManager(targetProject, true);
     } else if (argv.pmdJava) {
       const pmdPath: string|undefined = args[1];
       const configPath: string|undefined  = args[2];
