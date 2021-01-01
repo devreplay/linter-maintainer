@@ -14,7 +14,7 @@
     "publish:local": "sh ./scripts/npmPublish.sh",
     "test": "node ./bin/linter-maintainer ./ --eslint-js",
     "test:make": "node ./bin/linter-maintainer --generate ./",
-    "test:esall": "node ./bin/linter-maintainer ./ --eslint-js",
+    "test:es": "node ./bin/linter-maintainer ./ --eslint-js",
     "test:standard": "node ./bin/linter-maintainer ./ --standard",
     "test:ts": "node ./bin/linter-maintainer ./ --eslint-ts",
     "test:pmd": "node ./bin/linter-maintainer --pmd-java ./test/java '$HOME/pmd-bin-6.30.0/bin/run.sh pmd' test/java/quickstart.xml",

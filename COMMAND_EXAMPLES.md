@@ -1,16 +1,34 @@
-## ESLint for JavaScript
+## ESLint
 
 ### Validate rules
+
+For JavaScript
 
 ```sh
 linter-maintainer --eslint-js ./your/project/path
 ```
 
+For TypeScript
+
+```sh
+linter-maintainer --eslint-ts ./your/project/path
+```
+
 ### Generate rules
+
+For JS
 
 ```sh
 linter-maintainer --generate --eslint-js ./your/project/path > .eslintrc.json
 ```
+
+For TypeScript
+
+```sh
+linter-maintainer --generate --eslint-ts ./your/project/path > .eslintrc.json
+```
+
+
 <!-- ### Background command
 
 ```sh

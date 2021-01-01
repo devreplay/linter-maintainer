@@ -54,7 +54,7 @@ on: # rebuild any PRs and main branch changes
     branches:
       - master
 jobs:
-  devreplay:
+  lintermaintainer:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -100,9 +100,12 @@ jobs:
 |---|---|---|---|---|
 |JavaScript|ESLint|--eslint-js| ✅ | ✅ |
 |JavaScript|StandardJS||  |  |
-|TypeScript|ESLint|--eslint-ts| 🏃 |  |
+|TypeScript|ESLint|--eslint-ts| ✅  | ✅  |
 |Java|PMD|--pmd-java| ✅ | ✅ |
+|Java|checkstyle||  |  |
 |Python|Pylint|--pylint|✅|✅|
 |Python|flake8|||
 |Python|black|||
-|Ruby|robocop|||
+|Ruby|RoboCop|||
+|C++|cpplint||
+|Go|golangci-lint||
