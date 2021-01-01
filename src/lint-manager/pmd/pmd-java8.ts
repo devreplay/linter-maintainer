@@ -178,7 +178,7 @@ export class PMDManager extends LintManager {
   });
   }
   
-  async makeRuleMap(): Promise<RuleMap | undefined> {
+  async makeRuleMap(): Promise<RuleMap> {
     const command = makePMDCommand(this.projectPath, this.pmdPath);
     const results = await this.execute(command);
 

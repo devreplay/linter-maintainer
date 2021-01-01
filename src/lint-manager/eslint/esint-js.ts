@@ -7,12 +7,8 @@ import * as extend from './eslint-rule-extends';
 import { getAllFiles } from '../../util';
 
 export class ESLintManager extends LintManager {    
-    async execute (projectPath: string, configFile?: string): Promise<Result[]> {
-        console.log(projectPath);
-        console.log(configFile);
-        const cmd = ['eslint', '--no-eslintrc', '-c', '${JAVASCRIPT_ES_LINTER_RULES}'];
+    async execute (cmd: string[]): Promise<Result[]> {
         console.log(cmd);
-
         
         // すべてのルールを取得
         const rules = await this.getAvailableRules();
