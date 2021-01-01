@@ -16,8 +16,9 @@ export abstract class LintManager {
     projectPath: string;
     configPath?: string;
     targetFiles?: string[];
-    constructor (projectPath: string){
+    constructor (projectPath: string, configPath?: string){
         this.projectPath = projectPath;
+        this.configPath = configPath;
     }
 
     // execute(path: string, configFile?: string): Result[]

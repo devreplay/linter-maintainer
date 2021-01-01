@@ -139,12 +139,10 @@ function makePMDCommand(dirName: string, pmdPath: string) {
 
 export class PMDManager extends LintManager {
   pmdPath: string;
-  configPath?: string;
 
   constructor (projectPath: string, pmdPath?: string, configPath?: string){
-    super(projectPath);
+    super(projectPath, configPath);
     this.pmdPath = pmdPath? pmdPath: 'pmd';
-    this.configPath = configPath;
   }
 
   execute (cmd: string[]): Promise<Result[]> {
