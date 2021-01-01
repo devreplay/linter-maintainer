@@ -1,7 +1,6 @@
 import * as table from 'text-table';
 import * as csv from 'csv';
 import * as fs from 'fs';
-import { makeCommonRules, makeUncommonRules } from '../util';
 
 export class RuleMap {
   all: string[]
@@ -46,25 +45,6 @@ export class RuleMap {
     return (this.followed.length - this.getFalseNegative().length) / this.followed.length;
   }
 
-  outputSummary (): string {
-    const lintOuputs: string[][] = [];
-
-    lintOuputs.push(['Followed', this.followed.length.toString()]);
-    lintOuputs.push(['Unfollowed', this.unfollowed.length.toString()]);
-
-    lintOuputs.push(['Configured', this.enabled.length.toString()]);
-    lintOuputs.push(['Unconfigured', this.disabled.length.toString()]);
-
-    lintOuputs.push(['False Positive', this.getFalsePositive().length.toString()]);
-    lintOuputs.push(['False Negative', this.getFalseNegative().length.toString()]);
-
-    lintOuputs.push(['Accuracy', this.getAcurracy().toFixed(3)]);
-    lintOuputs.push(['Coverage', this.getCoverage().toFixed(3)]);
-    const output = table(lintOuputs);
-    
-    return output;
-  }
-
   makeAddRemovedSummary(): string {
     const outputTable: string[][] = [];
 
@@ -86,13 +66,10 @@ export class RuleMap {
   
     let output = table(outputTable);
 
-    const addedRules = FN.length;
-    const deletedRules = FP.length;
-    const total = addedRules + deletedRules;
     const summary = [
-      `\n\n${addedRules} rules are available`,
-      `${deletedRules} rules are ignored`,
-      `Total: ${total}`,
+      `\n\n${FN.length} rules are available`,
+      `${ FP.length} rules are ignored`,
+      `Total: ${FN.length +  FP.length}`,
     ];
     output += summary.join('\n');
     return output;
@@ -135,4 +112,16 @@ export function outputRuleResultTable (rules: RuleMap[], projects: string[], out
       });
     }
   });
+}
+
+export function makeCommonRules (rules1: string[], rules2: string[]): string[] {
+  const originalSet = new Set(rules1);
+  const diff = new Set([...rules2].filter(x => originalSet.has(x)));
+  return Array.from(diff);
+}
+
+export function makeUncommonRules (availableRules: string[], warnedRules: string[]): string[] {
+  const warnedSet = new Set(warnedRules);
+  const diff = new Set([...availableRules].filter(x => !warnedSet.has(x)));
+  return Array.from(diff);
 }
