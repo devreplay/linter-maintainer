@@ -17,7 +17,7 @@
     "test:esall": "node ./bin/linter-maintainer ./ --eslint-js",
     "test:standard": "node ./bin/linter-maintainer ./ --standard",
     "test:ts": "node ./bin/linter-maintainer ./ --eslint-ts",
-    "test:pmd": "node ./bin/linter-maintainer --pmd-java ./test '$HOME/pmd-bin-6.30.0/bin/run.sh pmd' test/quickstart.xml",
+    "test:pmd": "node ./bin/linter-maintainer --pmd-java ./test/java '$HOME/pmd-bin-6.30.0/bin/run.sh pmd' test/java/quickstart.xml",
     "refresh": "rm -rf ./node_modules ./package-lock.json && npm install",
     "verify": "npm-run-all clean compile"
   },
