@@ -1,18 +1,7 @@
-// export interface SARIFResult {
-//     ruleId: string,
-//     level: ["error", "warning", "information", "hint"],
-//     message: string
-//     locations: 
-// }
-// import { Result } from 'sarif';
-
 import { Result } from 'sarif';
 import { RuleMap } from './rule-map';
 
 export abstract class LintManager {
-    // 設定ファイルを取得する
-    // Lintを実行する
-    // 実行結果に基づいて設定ファイルを編集する
     projectPath: string;
     configPath?: string;
     targetFiles?: string[];
@@ -21,8 +10,6 @@ export abstract class LintManager {
         this.configPath = configPath;
     }
 
-    // execute(path: string, configFile?: string): Result[]
-    // executeWithRules(path: string, ruleIds: string[]): Result[]
     abstract execute (cmd: string[]): Promise<Result[]>;
     abstract getAvailableRules(): Promise<string[]>;
     abstract makeRuleMap(): Promise<RuleMap>;
