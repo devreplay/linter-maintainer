@@ -102,7 +102,7 @@ jobs:
 |JavaScript|StandardJS||  |  |
 |TypeScript|ESLint|--eslint-ts| 🏃 |  |
 |Java|PMD|--pmd-java| ✅ | ✅ |
-|Python|Pylint|--pylint|✅|🏃|
+|Python|Pylint|--pylint|✅|✅|
 |Python|flake8|||
 |Python|black|||
 |Ruby|robocop|||

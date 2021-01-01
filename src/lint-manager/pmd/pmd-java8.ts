@@ -190,22 +190,17 @@ export class PMDManager extends LintManager {
   
   async makeConfigFile(): Promise<string> {
     const ruleMap = await this.makeRuleMap();
-    if (ruleMap !== undefined) {
-      const head = [
-        '<?xml version="1.0"?>',
-        '<ruleset name="yourrule"',
-        'xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"',
-        'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',
-        'xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">',
-        '<description>Your configuration of PMD. Includes the rules that are most likely to apply for you.</description>'];
-      const rules = ruleMap.followed.map(x => `<rule ref="${makeFullRuleID(x)}"/>`);
-      const tail = '</ruleset>';     
+    const head = [
+      '<?xml version="1.0"?>',
+      '<ruleset name="yourrule"',
+      'xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"',
+      'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',
+      'xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">',
+      '<description>Your configuration of PMD. Includes the rules that are most likely to apply for you.</description>'];
+    const rules = ruleMap.followed.map(x => `<rule ref="${makeFullRuleID(x)}"/>`);
+    const tail = '</ruleset>';     
 
-      const content = [...head, ...rules, tail].join('\n');
-      return content;
-    }
-    throw new Error(
-      'Failed to generate PMD Config'
-    );
+    const content = [...head, ...rules, tail].join('\n');
+    return content;
   }
 }

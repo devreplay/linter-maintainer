@@ -143,7 +143,10 @@ export class PylintManager extends LintManager {
         return new RuleMap(all, unfollowed, enabled);
     }
 
-    makeConfigFile(): Promise<string> {
-        throw new Error('Method not implemented.');
+    async makeConfigFile(): Promise<string> {
+        const rules = (await this.makeRuleMap()).followed.join(',\n    ');
+        const head = 'enable=';
+        const content = [head, rules].join('\n    ');
+        return content;
     }
 }
