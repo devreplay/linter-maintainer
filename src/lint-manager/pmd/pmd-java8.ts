@@ -174,17 +174,20 @@ export class PMDManager extends LintManager {
     return pmdPromise;
   }
 
-  getAvailableRules(): string[] {
-    return allRule;
+  getAvailableRules(): Promise<string[]> {
+    return new Promise<string[]>((resolve) => {
+      resolve(allRule);
+  });
   }
   
   async makeRuleMap(): Promise<RuleMap | undefined> {
     const command = makePMDCommand(this.projectPath, this.pmdPath);
     const results = await this.execute(command);
 
+    const all = await this.getAvailableRules();
     const unfollowed = this.results2warnings(results);
     const enabled = this.configPath? collectRuleIdfromXML(this.configPath): [];
-    return new RuleMap(this.getAvailableRules(), unfollowed, enabled.map(x => makeShortRuleID(x)));
+    return new RuleMap(all, unfollowed, enabled.map(x => makeShortRuleID(x)));
   }
   
   async makeConfigFile(): Promise<string> {

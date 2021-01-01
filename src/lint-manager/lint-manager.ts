@@ -22,7 +22,7 @@ export abstract class LintManager {
 
     // execute(path: string, configFile?: string): Result[]
     // executeWithRules(path: string, ruleIds: string[]): Result[]
-    abstract getAvailableRules(): string[];
+    abstract getAvailableRules(): Promise<string[]>;
     abstract makeRuleMap(): Promise<RuleMap | undefined>;
     abstract makeConfigFile(): Promise<string>;
 

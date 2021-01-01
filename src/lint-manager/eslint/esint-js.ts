@@ -7,7 +7,7 @@ import * as extend from './eslint-rule-extends';
 import { getAllFiles } from '../../util';
 
 export class ESLintManager extends LintManager {    
-    execute (projectPath: string, configFile?: string): Result[] {
+    async execute (projectPath: string, configFile?: string): Promise<Result[]> {
         console.log(projectPath);
         console.log(configFile);
         const cmd = ['eslint', '--no-eslintrc', '-c', '${JAVASCRIPT_ES_LINTER_RULES}'];
@@ -15,7 +15,7 @@ export class ESLintManager extends LintManager {
 
         
         // すべてのルールを取得
-        const rules = this.getAvailableRules();
+        const rules = await this.getAvailableRules();
         // ルールを用いて実行する
         const warnings: Result[] = [];
         // 実行結果を返す
@@ -30,11 +30,13 @@ export class ESLintManager extends LintManager {
     }
 
 
-    getAvailableRules(): string[] {
+    getAvailableRules(): Promise<string[]> {
         const typescript = false;
         const target_rules = extend.selectExtends(false, true, false);
         const rules = eslint_manager.getRulesFromExtends(target_rules, this.projectPath, true, typescript);
-        return rules.ruleIds;
+        return new Promise<string[]>((resolve) => {
+            resolve(rules.ruleIds);
+        });
     }
 
     makeRuleMap (): Promise<RuleMap> {
