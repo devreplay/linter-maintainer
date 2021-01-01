@@ -1,7 +1,8 @@
 
 import * as gitminer from './gitminer';
 import { RuleMap, outputRuleResultTable } from './lint-manager/rule-map';
-import * as extend from './lint-manager/eslint/eslint-rule-extends';
-import * as eslint_manager from './lint-manager/eslint/esint';
-import * as util from './util';
-export {gitminer, RuleMap as SplitedRules, outputRuleResultTable, extend, eslint_manager, util};
+import { LintManager } from './lint-manager/lint-manager';
+import { ESLintManager } from './lint-manager/eslint/esint-js';
+import { PMDManager } from './lint-manager/pmd/pmd-java8';
+import { PylintManager } from './lint-manager/pylint/pylint';
+export { gitminer, RuleMap, outputRuleResultTable, LintManager, ESLintManager, PMDManager, PylintManager };
