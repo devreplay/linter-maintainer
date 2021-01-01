@@ -18,6 +18,7 @@
     "test:standard": "node ./bin/linter-maintainer ./ --standard",
     "test:ts": "node ./bin/linter-maintainer ./ --eslint-ts",
     "test:pmd": "node ./bin/linter-maintainer --pmd-java ./test/java '$HOME/pmd-bin-6.30.0/bin/run.sh pmd' test/java/quickstart.xml",
+    "test:pylint": "node ./bin/linter-maintainer test/python/simplecaeser.py --pylint",
     "refresh": "rm -rf ./node_modules ./package-lock.json && npm install",
     "verify": "npm-run-all clean compile"
   },

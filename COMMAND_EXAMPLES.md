@@ -49,3 +49,16 @@ linter-maintainer --generate --pmd-java ./your/project/path pmd.bat > yourpmd.xm
 "flake8 --config=${PYTHON_FLAKE8_LINTER_RULES}"
 "black --config ${PYTHON_BLACK_LINTER_RULES} --diff --check" -->
 <!-- "java -jar /usr/bin/checkstyle -c ${JAVA_LINTER_RULES}" -->
+
+
+## Pylint
+
+### Validate rules
+
+```sh
+linter-maintainer --pylint ./your/project/path
+```
+
+<!-- ```sh
+pylint test/python/simplecaeser.py --msg-template='{symbol} ({msg_id})'
+``` -->

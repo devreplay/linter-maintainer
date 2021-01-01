@@ -15,7 +15,7 @@ npm install -g linter-maintainer
 #### 3.1 If you want to generate configfile such as `.eslintrc.json`
 
 ```sh
-linter-maintainer --generate --eslint-js ./your/project/path
+linter-maintainer --generate --eslint-js ./your/project/path > .eslintrc.json
 ```
 
 #### 3.2 If you want to get recommended rules
@@ -76,7 +76,7 @@ jobs:
             "owner": "linter-maintainer",
             "pattern": [
                 {
-                    "regexp": "^(warning|error)\\s+((Available|Ignored)\\s+(.+))",
+                    "regexp": "^(warning|error)\\s+(.+)\\s+is.+",
                     "severity": 1,
                     "message": 2
                 }
@@ -96,13 +96,13 @@ jobs:
 * ✅: Done
 * 🏃: Work in progress
 
-|Language|Tool|command|Validate Rule|Generate Rule|
+|Language|Tool|command|Validate Rules|Generate Rules|
 |---|---|---|---|---|
 |JavaScript|ESLint|--eslint-js| ✅ | ✅ |
 |JavaScript|StandardJS||  |  |
 |TypeScript|ESLint|--eslint-ts| 🏃 |  |
 |Java|PMD|--pmd-java| ✅ | ✅ |
-|Python|Pylint|||
+|Python|Pylint|--pylint|✅|🏃|
 |Python|flake8|||
 |Python|black|||
 |Ruby|robocop|||

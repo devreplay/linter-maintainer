@@ -2,20 +2,21 @@ import * as commander from 'commander';
 import { LintManager } from './lint-manager/lint-manager';
 import { ESLintManager } from './lint-manager/eslint/esint-js';
 import { PMDManager } from './lint-manager/pmd/pmd-java8';
+import { PylintManager } from './lint-manager/pylint/pylint';
 
 interface Argv {
   eslintJs?: boolean
   eslintTs?: boolean
   standard?: boolean
   pmdJava?: boolean
-  evaluate?: boolean
+  pylint?: boolean
   generate?: boolean
 }
 
 interface Option {
   short?: string
   // Commander will camelCase option names.
-  name: keyof Argv | 'eslint-js' | 'eslint-ts' | 'standard' | 'pmd-java' | 'generate'
+  name: keyof Argv | 'eslint-js' | 'eslint-ts' | 'standard' | 'pmd-java' | 'pylint' |'generate'
   type: 'string' | 'boolean' | 'array'
   describe: string // Short, used for usage message
   description: string // Long, used for `--help`
@@ -45,6 +46,12 @@ const options: Option[] = [
     type: 'boolean',
     describe: 'Use PMD for Java',
     description: 'Use PMD for Java files'
+  },
+  {
+    name: 'pylint',
+    type: 'boolean',
+    describe: 'Use Pylint',
+    description: 'Use Pylint for Python files'
   },
   {
     name: 'generate',
@@ -82,28 +89,28 @@ const cli = {
     } else if (argv.eslintTs) {
       lintManager = new ESLintManager(targetProject);
     } else if (argv.pmdJava) {
-      const pmdPath = args[1];
-      const configPath = args[2];
+      const pmdPath: string|undefined = args[1];
+      const configPath: string|undefined  = args[2];
       lintManager = new PMDManager(targetProject, pmdPath, configPath);
+    } else if (argv.pylint) {
+      lintManager = new PylintManager(targetProject);
     } else {
-      lintManager = new ESLintManager(targetProject);
+      console.error('No target linter specified.');
+      return 2;
     }
 
     if (argv.generate) {
       const configContent = await lintManager.makeConfigFile();
       console.log(configContent);
+      return 0;
     } else {
       const ruleMap = await lintManager.makeRuleMap();
-      if (ruleMap === undefined) {
-        return 1;
-      }
       const hiddenRules = ruleMap.getFalseNegative();
       const unwantedRules = ruleMap.getFalsePositive();
       console.log(ruleMap.makeAddRemovedSummary());
       const results_length = hiddenRules.length + unwantedRules.length;
       return results_length === 0 ? 0 : 1;
     }
-    return 0;
   }
 };
 
