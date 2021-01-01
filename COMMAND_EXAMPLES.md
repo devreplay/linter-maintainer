@@ -59,6 +59,12 @@ linter-maintainer --generate --pmd-java ./your/project/path pmd.bat > yourpmd.xm
 linter-maintainer --pylint ./your/project/path
 ```
 
+### Generate rules
+
+```sh
+linter-maintainer --generate --pylint ./your/project/path > pylintrc
+```
+
 <!-- ```sh
 pylint test/python/simplecaeser.py --msg-template='{symbol} ({msg_id})'
 ``` -->
