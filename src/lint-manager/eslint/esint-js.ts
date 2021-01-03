@@ -43,13 +43,23 @@ function searchConfigFile (cwd: string): string {
 }
 
 
-export class ESLintManager extends LintManager {
+export class ESLintJSManager extends LintManager {
     engine: CLIEngine;
-    ESRecommended = ['eslint:recommended'];
-    ESAll = ['eslint:all'];
-    extension = '.js';
+    ESRecommended: string[];
+    ESAll: string[];
+    extension: string;
+    config: Linter.BaseConfig<Linter.RulesRecord>;
     constructor (projectPath: string){
         super(projectPath);
+        this.ESRecommended = ['eslint:recommended'];
+        this.ESAll = ['eslint:all'];
+        this.extension = '.js';
+        this.config = {
+            'parserOptions': {
+                'ecmaVersion': 2018,
+                'sourceType': 'module'
+            }
+        };
         const target_rules = this.selectExtends(true);
         const all_rules = this.getRulesFromExtends(target_rules);
         this.engine = all_rules.engine;
@@ -107,17 +117,7 @@ export class ESLintManager extends LintManager {
     }
 
     rules2config(rules: string[]): string {
-        const config: Linter.BaseConfig<Linter.RulesRecord> = {
-            'rules': {},
-            'env': {},
-            'parserOptions': {},
-            'extends': []
-        };
-    
-        config.parserOptions = {
-            'ecmaVersion': 11,
-            'sourceType': 'module'
-        };
+        const config = this.config;
         const newRule: Linter.RulesRecord = rules.reduce(
             (a, x) => ({...a,
                 [x]: 'error'}),
@@ -130,13 +130,8 @@ export class ESLintManager extends LintManager {
     }
 
     getRulesFromExtends (extendsName: string | string[]): Rules {
-        const config: Linter.BaseConfig = {
-            'extends': extendsName,
-            'parserOptions': {
-                'ecmaVersion': 2018,
-                'sourceType': 'module'
-            }
-        };
+        const config = this.config;
+        config.extends = extendsName;
     
         const engine = new CLIEngine({'baseConfig': config, 'useEslintrc': false});
         const rules = engine.getRules();

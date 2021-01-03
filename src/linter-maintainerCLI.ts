@@ -1,6 +1,7 @@
 import * as commander from 'commander';
 import { LintManager } from './lint-manager/lint-manager';
-import { ESLintManager } from './lint-manager/eslint/esint-js';
+import { ESLintJSManager } from './lint-manager/eslint/esint-js';
+import { ESLintTSManager } from './lint-manager/eslint/esint-ts';
 import { PMDManager } from './lint-manager/pmd/pmd-java8';
 import { PylintManager } from './lint-manager/pylint/pylint';
 
@@ -85,9 +86,9 @@ const cli = {
 
     let lintManager: LintManager;
     if (argv.eslintJs) {
-      lintManager = new ESLintManager(targetProject);
+      lintManager = new ESLintJSManager(targetProject);
     } else if (argv.eslintTs) {
-      lintManager = new ESLintManager(targetProject);
+      lintManager = new ESLintTSManager(targetProject);
     } else if (argv.pmdJava) {
       const pmdPath: string|undefined = args[1];
       const configPath: string|undefined  = args[2];

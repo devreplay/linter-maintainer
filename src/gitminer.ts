@@ -81,6 +81,34 @@ export async function getChangedFilesWithHEAD (dirPath: string, length: number, 
     .map(file => { return file.file; });
 }
 
+
+export function makeTagDiffKind (tag_a: string, tag_b: string): number {
+  // Check tag is X.Y.Z and return diff of the version
+  // Major 0
+  // Minor 1
+  // Marintainance 2
+  // Fail -1
+  const partsA = parseTagVersion(tag_a);
+  const partsB = parseTagVersion(tag_b);
+
+  if (partsA.length !== partsB.length) {
+    return -1;
+  }
+
+  let diff = 0;
+  let diff_index = 0;
+  for (let l = Math.max(partsA.length, partsB.length); diff_index < l; diff_index++) {
+    const a = partsA[diff_index];
+    const b = partsB[diff_index];
+    diff = a === b ? 0 : a > b ? 1 : -1;
+    if (diff) {
+      return diff_index;
+    }
+  }
+  return -1;
+}
+
+
 export async function checkOutToHEAD (dirPath: string): Promise<void> {
   const localGit: git.SimpleGit = git(dirPath);
   try {
