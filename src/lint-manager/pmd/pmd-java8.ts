@@ -187,9 +187,8 @@ export class PMDManager extends LintManager {
     const enabled = this.configPath? collectRuleIdfromXML(this.configPath): [];
     return new RuleMap(all, unfollowed, enabled.map(x => makeShortRuleID(x)));
   }
-  
-  async makeConfigFile(): Promise<string> {
-    const ruleMap = await this.makeRuleMap();
+
+  rules2config(rules: string[]): string {
     const head = [
       '<?xml version="1.0"?>',
       '<ruleset name="yourrule"',
@@ -197,10 +196,10 @@ export class PMDManager extends LintManager {
       'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',
       'xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">',
       '<description>Your configuration of PMD. Includes the rules that are most likely to apply for you.</description>'];
-    const rules = ruleMap.followed.map(x => `<rule ref="${makeFullRuleID(x)}"/>`);
+    const content = rules.map(x => `<rule ref="${makeFullRuleID(x)}"/>`);
     const tail = '</ruleset>';     
 
-    const content = [...head, ...rules, tail].join('\n');
-    return content;
+    const output = [...head, ...content, tail].join('\n');
+    return output;
   }
 }

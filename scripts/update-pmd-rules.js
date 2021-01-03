@@ -1,5 +1,8 @@
 'use strict';
-
+/**
+ * Collect PMD rules from PMD original source code
+ * Link: https://github.com/pmd/pmd/tree/master/pmd-java/src/main/resources/category/java
+ */
 var path = require('path');
 var fs = require('fs');
 var https = require('https');

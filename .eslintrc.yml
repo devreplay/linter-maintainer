@@ -18,3 +18,4 @@ rules:
     curly: "warn"
     quotes: ["error", "single", { "allowTemplateLiterals": true } ]
     eqeqeq: "error"
+    '@typescript-eslint/no-unused-vars': ["error", { "argsIgnorePattern": "^_" }]

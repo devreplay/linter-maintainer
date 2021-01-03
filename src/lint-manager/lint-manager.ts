@@ -13,7 +13,17 @@ export abstract class LintManager {
     abstract execute (cmd: string[]): Promise<Result[]>;
     abstract getAvailableRules(): Promise<string[]>;
     abstract makeRuleMap(): Promise<RuleMap>;
-    abstract makeConfigFile(): Promise<string>;
+    abstract rules2config(rules: string[]): string;
+    
+    async selectAppliedRules(): Promise<string[]> {
+        return (await this.makeRuleMap()).followed;
+    }
+    
+    async makeConfigFile (): Promise<string> {
+        const rules = await this.selectAppliedRules();
+        const config = this.rules2config(rules);
+        return config;
+    }
 
     results2warnings(results: Result[]): string[] {
         const newresult = [];

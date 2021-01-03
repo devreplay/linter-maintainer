@@ -5,7 +5,7 @@ import * as csvWriter from 'csv-writer';
 import * as fs from 'fs';
 
 import * as gitminer from './gitminer';
-import * as eslint from './lint-manager/eslint/esint';
+import * as eslint from './lint-manager/eslint/tmp_esint';
 import * as extend from './lint-manager/eslint/eslint-rule-extends';
 import * as util from './util';
 

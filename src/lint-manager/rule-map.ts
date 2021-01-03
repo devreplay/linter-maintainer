@@ -16,9 +16,9 @@ export class RuleMap {
   ) {
     this.all = all;
     this.unfollowed = unfollowed;
-    this.followed = makeUncommonRules(this.all, this.unfollowed);
+    this.followed = makeAMinusBRules(this.all, this.unfollowed);
     this.enabled = enabled;
-    this.disabled = makeUncommonRules([...this.followed, ...this.unfollowed], this.enabled);
+    this.disabled = makeAMinusBRules(this.all, this.enabled);
   }
 
   getTruePositive (): string[] {
@@ -114,14 +114,14 @@ export function outputRuleResultTable (rules: RuleMap[], projects: string[], out
   });
 }
 
-export function makeCommonRules (rules1: string[], rules2: string[]): string[] {
-  const originalSet = new Set(rules1);
-  const diff = new Set([...rules2].filter(x => originalSet.has(x)));
+export function makeCommonRules (rulesA: string[], rulesB: string[]): string[] {
+  const originalSet = new Set(rulesA);
+  const diff = new Set([...rulesB].filter(x => originalSet.has(x)));
   return Array.from(diff);
 }
 
-export function makeUncommonRules (availableRules: string[], warnedRules: string[]): string[] {
-  const warnedSet = new Set(warnedRules);
-  const diff = new Set([...availableRules].filter(x => !warnedSet.has(x)));
+export function makeAMinusBRules (rulesA: string[], rulesB: string[]): string[] {
+  const bSet = new Set(rulesB);
+  const diff = new Set([...rulesA].filter(x => !bSet.has(x)));
   return Array.from(diff);
 }

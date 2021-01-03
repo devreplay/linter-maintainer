@@ -26,22 +26,9 @@ export const TSStandard = [
   'standard-with-typescript'
 ];
 
-export function selectExtends (isTS?: boolean, isAll?: boolean, isStandard?: boolean): string[] {
-  if (isTS === true) {
-    if (isAll === true) {
-      return TSAll;
-    }
-    if (isStandard === true) {
-      return TSStandard;
-    }
-    return TSRecommended;
-  }
-
+export function selectExtends (isAll?: boolean): string[] {
   if (isAll === true) {
     return ESAll;
-  }
-  if (isStandard === true) {
-    return ESStandard;
   }
   return ESRecommended;
 }

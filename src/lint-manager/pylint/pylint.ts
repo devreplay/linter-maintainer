@@ -143,10 +143,10 @@ export class PylintManager extends LintManager {
         return new RuleMap(all, unfollowed, enabled);
     }
 
-    async makeConfigFile(): Promise<string> {
-        const rules = (await this.makeRuleMap()).followed.join(',\n    ');
-        const head = 'enable=';
-        const content = [head, rules].join('\n    ');
-        return content;
+    rules2config(rules: string[]): string {
+      const content = rules.join(',\n    ');
+      const head = 'enable=';
+      const output = [head, content].join('\n    ');
+      return output;
     }
 }
