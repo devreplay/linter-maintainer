@@ -9,7 +9,7 @@ set -e
 rm -rf tempPublish
 mkdir tempPublish
 
-git clone https://github.com/Ikuyadeu/linter-maintainer.git tempPublish
+git clone https://github.com/devreplay/linter-maintainer.git tempPublish
 cd tempPublish
 
 yarn install --pure-lockfile

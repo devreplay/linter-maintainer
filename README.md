@@ -12,6 +12,8 @@ npm install -g linter-maintainer
 
 ### 2. Execute
 
+The detail of each language usage is [here](https://github.com/devreplay/linter-maintainer/blob/master/COMMAND_EXAMPLES.md)
+
 #### 3.1 If you want to generate configfile such as `.eslintrc.json`
 
 ```sh

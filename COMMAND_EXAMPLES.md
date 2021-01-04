@@ -37,17 +37,21 @@ eslint --no-eslintrc -c .eslintrc.yml
 
 ## PMD for Java
 
-LinterMaintainer will work by executing local PMD path. 
-* Windows: `pmd.bat`
-* Linux: `$HOME/pmd-bin-6.30.0/bin/run.sh pmd`
+### Dependencies
+
+1. You needs to install PMD from [official page](https://pmd.github.io/).
+I checked works on the PMD version 6.30.0.
+
+2. LinterMaintainer will work by executing local PMD path.
+    * Windows: `pmd.bat`
+    * Linux: `$HOME/pmd-bin-6.30.0/bin/run.sh pmd`
+Following example use the path of `pmd.bat`
 
 <!-- 
 ### Background command
 ```sh
 pmd.bat -d ./your/project/path -f csv -rulesets category/java/bestpractices.xml,category/java/codestyle.xml,category/java/design.xml,category/java/documentation.xml,category/java/errorprone.xml,category/java/multithreading.xml,category/java/performance.xml,category/java/security.xml              
 ``` -->
-
-Following example use the path of `pmd.bat`
 
 ### Validate rules
 
@@ -70,6 +74,8 @@ linter-maintainer --generate --pmd-java ./your/project/path pmd.bat > yourpmd.xm
 
 
 ## Pylint
+
+You needs to install [Pylint](https://www.pylint.org/) > 2.6
 
 ### Validate rules
 
