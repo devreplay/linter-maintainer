@@ -86,7 +86,6 @@ function readConfig(xmlPath:string): PmdConfig {
         const jsonObj = xmlparse(contents, options) as PmdConfig;
         return jsonObj;
       } catch (error) {
-        console.error(error);
         throw new Error(
           'Failed to parse PMD Config.'
         );
@@ -128,6 +127,33 @@ function makePMDCommand(dirName: string, pmdPath: string): string[] {
 }
 
 
+function runPmd(cmd: string[]): Promise<string> {
+  const commandBufferSize = 64;
+  const pmdCmd = exec(cmd.join(' '), {
+    maxBuffer: commandBufferSize * 1024 * 1024,
+  });
+  let stdoutSum = '';
+  const pmdPromise = new Promise<string>((resolve, reject) => {
+    pmdCmd.addListener('error', (e) => {
+      console.error(e);
+      reject(e);
+    });
+    pmdCmd.addListener('exit', () => {
+      resolve(stdoutSum);
+    });
+
+    pmdCmd.stdout?.on('data', (stdout: string) => {
+      stdoutSum += stdout;
+    });
+    if (pmdCmd.stderr) {
+      pmdCmd.stderr.on('data', (m: string) => {
+        console.error(`error: ${m}`);
+      });
+    }
+  });
+  return pmdPromise;
+}
+
 export class PMDManager extends LintManager {
   pmdPath: string;
 
@@ -136,34 +162,12 @@ export class PMDManager extends LintManager {
     this.pmdPath = pmdPath? pmdPath: 'pmd';
   }
 
-  execute (cmd: string[]): Promise<Result[]> {
-    let result: Result[] = [];
-    const commandBufferSize = 64;
-    const pmdCmd = exec(cmd.join(' '), {
-      maxBuffer: commandBufferSize * 1024 * 1024,
-    });
-    const pmdPromise = new Promise<Result[]>((resolve, reject) => {
-      pmdCmd.addListener('error', (e) => {
-        console.error(e);
-        reject(e);
-      });
-      pmdCmd.addListener('exit', () => {
-        resolve(result);
-      });
+  async execute (cmd: string[]): Promise<Result[]> {
+    const data = await runPmd(cmd);
+    const pmdData = parsePmdCsv(data);
+    const output = pmdJson2Sarif(pmdData);
   
-      pmdCmd.stdout?.on('data', (stdout: string) => {
-        const output = parsePmdCsv(stdout);
-        result = pmdJson2Sarif(output);
-      });
-      if (pmdCmd.stderr) {
-        pmdCmd.stderr.on('data', (m: string) => {
-          console.error(`error: ${m}`);
-        });
-      }
-      
-    });
-  
-    return pmdPromise;
+    return output;
   }
 
   getAvailableRules(): Promise<string[]> {
