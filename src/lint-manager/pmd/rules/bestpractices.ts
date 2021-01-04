@@ -30,8 +30,6 @@ export const rules: string[] = [
 'MethodReturnsInternalArray',
 'MissingOverride',
 'OneDeclarationPerLine',
-'PositionLiteralsFirstInCaseInsensitiveComparisons',
-'PositionLiteralsFirstInComparisons',
 'PreserveStackTrace',
 'ReplaceEnumerationWithIterator',
 'ReplaceHashtableWithMap',

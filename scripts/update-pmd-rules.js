@@ -76,7 +76,9 @@ async function correctRules(category, rule_url) {
 			if( parser.validate(content) === true) { //optional (it'll return an object in case it's not valid)
 				var jsonObj = parser.parse(content, options);
 				for (const rule of jsonObj['ruleset']['rule']) {
-					rules.push("'" + rule['@_name'] + "'")
+					if (rule['@_deprecated'] !== true) {
+						rules.push("'" + rule['@_name'] + "'");
+					}
 				}
 			}
 			const rulePath = `src/lint-manager/pmd/rules/${category}.ts`

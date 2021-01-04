@@ -6,7 +6,6 @@ export const rules: string[] = [
 'DontCallThreadRun',
 'DoubleCheckedLocking',
 'NonThreadSafeSingleton',
-'UnsynchronizedStaticDateFormatter',
 'UnsynchronizedStaticFormatter',
 'UseConcurrentHashMap',
 'UseNotifyAllInsteadOfNotify'];
