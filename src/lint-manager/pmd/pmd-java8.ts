@@ -4,6 +4,7 @@ import { Options } from 'csv-parse';
 import { EOL } from 'os';
 import { exec } from 'child_process';
 import { Result } from 'sarif';
+// import path = require('path');
 
 import { LintManager } from '../lint-manager';
 import { RuleMap } from '../rule-map';
@@ -118,7 +119,7 @@ function pmdJson2Sarif(pmdResults: Array<PmdResult>): Result[] {
   return output;
 }
 
-function makePMDCommand(dirName: string, pmdPath: string) {
+function makePMDCommand(dirName: string, pmdPath: string): string[] {
   const PMD_CATEGORY = [
     'bestpractices',
     'codestyle',
@@ -131,9 +132,12 @@ function makePMDCommand(dirName: string, pmdPath: string) {
   ].map(x => {
     return `category/java/${x}.xml`;
   });
-
-  // pmd -d ./test/ -f text -rulesets rulesets/java/quickstart.xml,category/java/codestyle.xml
-  return  [pmdPath, '-d', dirName, '-f', 'csv', '-rulesets', PMD_CATEGORY.join(',')];
+  const dictkey = ['-d', dirName];
+  const formatkey = ['-f', 'csv'];
+  const rulekey = ['-rulesets', PMD_CATEGORY.join(',')];
+  const cmd = [pmdPath, '-no-cache', ...dictkey, ...formatkey, ...rulekey];
+  console.log(cmd.join(' '));
+  return  cmd;
 }
 
 
