@@ -66,10 +66,14 @@ export class RuleMap {
   
     let output = table(outputTable);
 
+    const accuracyStr = Number((this.getAcurracy()) * 100).toFixed(1);
+    const coverageStr = Number((this.getCoverage()) * 100).toFixed(1);
+
     const summary = [
       `\n\n${FN.length} rules are available`,
       `${ FP.length} rules are ignored`,
       `Total: ${FN.length +  FP.length}`,
+      `Accuracy: ${accuracyStr}% Coverage: ${coverageStr}%`
     ];
     output += summary.join('\n');
     return output;
