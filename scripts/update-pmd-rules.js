@@ -82,25 +82,55 @@ async function correctRules(category, rule_url) {
 				}
 			}
 			const rulePath = `src/lint-manager/pmd/rules/${category}.ts`
+			const fullRules = rules.map(x => `category/java/${category}.xml/${x.slice(1,-1)}`)
+			all_rules.push(...fullRules)
+			added_category.push(category)
+			if (added_category.length == PMD_CATEGORY.length) {
+				writeRules(all_rules)
+			}
 			fs.writeFileSync(rulePath, strArray2tsCode(rules));
 			console.log('Updated ' + path.basename(rulePath));
 		} catch(e) { console.log(e) }
 	})
 }
 
+async function executeAll() {
+	const pmd_header = 'https://raw.githubusercontent.com/pmd/pmd/master/pmd-java/src/main/resources'
 
-const pmd_header = 'https://raw.githubusercontent.com/pmd/pmd/master/pmd-java/src/main/resources'
+	PMD_CATEGORY.map(x => {
+		return [x, `${pmd_header}/category/java/${x}.xml`];
+	}).forEach((x) => { correctRules(x[0], x[1]) } );
+}
+
+function writeRules(rules) {
+	// const rulePathes = PMD_CATEGORY.map(x => `${pmd_header}/category/java/${x}.xml` )
+	const head = [
+		'<?xml version="1.0"?>',
+		'<ruleset name="yourrule"',
+		'xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"',
+		'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',
+		'xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">',
+		'<description>Your configuration of PMD. Includes the rules that are most likely to apply for you.</description>'];
+	const content = rules.map(x => { return `<rule ref="${x}"/>` } );
+	const tail = '</ruleset>';
+	const rulePath = `src/lint-manager/pmd/rules/all-java.xml`
+	const output = [...head, ...content, tail].join('\n');
+	fs.writeFileSync(rulePath, output);
+	console.log('Updated ' + path.basename(rulePath));
+}
+
+
 const PMD_CATEGORY = [
-    'bestpractices',
-    'codestyle',
-    'design',
-    'documentation',
-    'errorprone',
-    'multithreading',
-    'performance',
-    'security'
-  ]
+	'bestpractices',
+	'codestyle',
+	'design',
+	'documentation',
+	'errorprone',
+	'multithreading',
+	'performance',
+	'security'
+]
+let added_category = []
+let all_rules = []
+executeAll()
 
-PMD_CATEGORY.map(x => {
-    return [x, `${pmd_header}/category/java/${x}.xml`];
-}).forEach((x) => correctRules(x[0], x[1]));
