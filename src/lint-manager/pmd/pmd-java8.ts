@@ -8,7 +8,7 @@ import { Result } from 'sarif';
 
 import { LintManager } from '../lint-manager';
 import { RuleMap } from '../rule-map';
-import { allRule, makeFullRuleID, makeShortRuleID } from './pmd-java8-rules';
+import { allRules, makeFullRuleID, makeShortRuleID } from './pmd-java8-rules';
 import { tryReadFile } from '../../util';
 
 interface PmdConfig {
@@ -62,7 +62,6 @@ export function parsePmdCsv(csv: string): Array<PmdResult> {
         'Failed to parse PMD Results.  Enable please logging (STDOUT & STDERROR) and submit an issue if this problem persists.'
       );
     }
-    console.error('Failed to read all PMD problems!');
   }
   return results;
 }
@@ -120,23 +119,11 @@ function pmdJson2Sarif(pmdResults: Array<PmdResult>): Result[] {
 }
 
 function makePMDCommand(dirName: string, pmdPath: string): string[] {
-  const PMD_CATEGORY = [
-    'bestpractices',
-    'codestyle',
-    'design',
-    'documentation',
-    'errorprone',
-    'multithreading',
-    'performance',
-    'security'
-  ].map(x => {
-    return `category/java/${x}.xml`;
-  });
+  const rules = allRules.map(x => { return makeFullRuleID(x); });
   const dictkey = ['-d', dirName];
   const formatkey = ['-f', 'csv'];
-  const rulekey = ['-rulesets', PMD_CATEGORY.join(',')];
+  const rulekey = ['-rulesets', rules.join(',')];
   const cmd = [pmdPath, '-no-cache', ...dictkey, ...formatkey, ...rulekey];
-  console.log(cmd.join(' '));
   return  cmd;
 }
 
@@ -151,7 +138,10 @@ export class PMDManager extends LintManager {
 
   execute (cmd: string[]): Promise<Result[]> {
     let result: Result[] = [];
-    const pmdCmd = exec(cmd.join(' '), {});
+    const commandBufferSize = 64;
+    const pmdCmd = exec(cmd.join(' '), {
+      maxBuffer: commandBufferSize * 1024 * 1024,
+    });
     const pmdPromise = new Promise<Result[]>((resolve, reject) => {
       pmdCmd.addListener('error', (e) => {
         console.error(e);
@@ -178,7 +168,7 @@ export class PMDManager extends LintManager {
 
   getAvailableRules(): Promise<string[]> {
     return new Promise<string[]>((resolve) => {
-      resolve(allRule);
+      resolve(allRules);
   });
   }
   

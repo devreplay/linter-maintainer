@@ -8,7 +8,7 @@ import { rules as multithreading } from './rules/multithreading';
 import { rules as performance } from './rules/performance';
 import { rules as security } from './rules/security';
 
-export const allRule: string[] = [
+export const allRules: string[] = [
     ...bestpractices,
     ...codestyle,
     ...design,
