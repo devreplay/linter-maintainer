@@ -1,6 +1,6 @@
 {
   "name": "linter-maintainer",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Suitable the linters for your style",
   "bin": {
     "linter-maintainer": "./bin/linter-maintainer"
@@ -12,11 +12,12 @@
     "create": "npm run build && npm run test",
     "compile": "tsc -p src",
     "publish:local": "sh ./scripts/npmPublish.sh",
+    "update:rules": "node ./scripts/update-pmd-rules.js",
     "test": "node ./bin/linter-maintainer ./ --eslint-js",
     "test:make": "node ./bin/linter-maintainer --generate ./",
     "test:eslint-js": "node ./bin/linter-maintainer ./ --eslint-js",
     "test:eslint-ts": "node ./bin/linter-maintainer ./src --eslint-ts",
-    "test:pmd": "node ./bin/linter-maintainer --pmd-java ./test/java '$HOME/pmd-bin-6.30.0/bin/run.sh pmd' test/java/quickstart.xml",
+    "test:pmd": "node ./bin/linter-maintainer --pmd-java ../selogger '$HOME/pmd-bin-6.30.0/bin/run.sh pmd' test/java/quickstart.xml",
     "test:pylint": "node ./bin/linter-maintainer test/python/simplecaeser.py --pylint",
     "refresh": "rm -rf ./node_modules ./package-lock.json && npm install",
     "verify": "npm-run-all clean compile"
