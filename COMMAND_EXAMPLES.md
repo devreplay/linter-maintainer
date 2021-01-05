@@ -58,6 +58,7 @@ pmd.bat -d ./your/project/path -f csv -rulesets category/java/bestpractices.xml,
 ```sh
 linter-maintainer --pmd-java ./your/project/path pmd.bat ./your/pmd/configfile.xml
 ```
+`./your/pmd/configfile.xml` encode should be UTF-8
 
 ### Generate rules
 
