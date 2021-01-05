@@ -4,7 +4,9 @@ import { Options } from 'csv-parse';
 import { EOL } from 'os';
 import { exec } from 'child_process';
 import { Result } from 'sarif';
-// import path = require('path');
+import { cwd } from 'process';
+import path = require('path');
+import fs = require('fs');
 
 import { LintManager } from '../lint-manager';
 import { RuleMap } from '../rule-map';
@@ -117,11 +119,10 @@ function pmdJson2Sarif(pmdResults: Array<PmdResult>): Result[] {
   return output;
 }
 
-function makePMDCommand(dirName: string, pmdPath: string): string[] {
-  const rules = allRules.map(x => { return makeFullRuleID(x); });
+function makePMDCommand(dirName: string, pmdPath: string, rulePath: string): string[] {
   const dictkey = ['-d', dirName];
   const formatkey = ['-f', 'csv'];
-  const rulekey = ['-rulesets', rules.join(',')];
+  const rulekey = ['-rulesets', rulePath];
   const cmd = [pmdPath, '-no-cache', ...dictkey, ...formatkey, ...rulekey];
   return  cmd;
 }
@@ -177,8 +178,14 @@ export class PMDManager extends LintManager {
   }
   
   async makeRuleMap(): Promise<RuleMap> {
-    const command = makePMDCommand(this.projectPath, this.pmdPath);
+    const allRulesXMLContents = this.rules2config(allRules);
+    const allRulesXMLPath = path.join(cwd(), 'all-rules.xml');
+    fs.writeFileSync(allRulesXMLPath, allRulesXMLContents);
+
+    const command = makePMDCommand(this.projectPath, this.pmdPath, allRulesXMLPath);
     const results = await this.execute(command);
+
+    fs.unlinkSync(allRulesXMLPath);
 
     const all = await this.getAvailableRules();
     const unfollowed = this.results2warnings(results);
