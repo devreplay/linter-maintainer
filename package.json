@@ -1,6 +1,6 @@
 {
   "name": "linter-maintainer",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Suitable the linters for your style",
   "bin": {
     "linter-maintainer": "./bin/linter-maintainer"
@@ -10,7 +10,7 @@
   "scripts": {
     "clean": "rimraf lib",
     "create": "npm run build && npm run test",
-    "compile": "tsc -p src",
+    "compile": "yarn clean && tsc -p src",
     "publish:local": "sh ./scripts/npmPublish.sh",
     "update:rules": "node ./scripts/update-pmd-rules.js",
     "test": "node ./bin/linter-maintainer ./ --eslint-js",
