@@ -6,78 +6,31 @@ import { PMDManager } from './lint-manager/pmd/pmd-java8';
 import { PylintManager } from './lint-manager/pylint/pylint';
 
 interface Argv {
+  version: string
   eslintJs?: boolean
   eslintTs?: boolean
-  standard?: boolean
   pmdJava?: boolean
   pylint?: boolean
   generate?: boolean
 }
 
-interface Option {
-  short?: string
-  // Commander will camelCase option names.
-  name: keyof Argv | 'eslint-js' | 'eslint-ts' | 'standard' | 'pmd-java' | 'pylint' |'generate'
-  type: 'string' | 'boolean' | 'array'
-  describe: string // Short, used for usage message
-  description: string // Long, used for `--help`
-}
-
-const options: Option[] = [
-  {
-    name: 'eslint-js',
-    type: 'boolean',
-    describe: 'Use ESlint for JS',
-    description: 'Use ESlint for JavaScript files'
-  },
-  {
-    name: 'eslint-ts',
-    type: 'boolean',
-    describe: 'Use ESLint for TS',
-    description: 'Use ESLint for TypeScript files'
-  },
-  {
-    name: 'standard',
-    type: 'boolean',
-    describe: 'Use standardjs',
-    description: 'Use standardjs the directory files'
-  },
-  {
-    name: 'pmd-java',
-    type: 'boolean',
-    describe: 'Use PMD for Java',
-    description: 'Use PMD for Java files'
-  },
-  {
-    name: 'pylint',
-    type: 'boolean',
-    describe: 'Use Pylint',
-    description: 'Use Pylint for Python files'
-  },
-  {
-    name: 'generate',
-    type: 'boolean',
-    describe: 'generate a config file',
-    description: 'generate a config file on the target projects'
-  }
-];
-
 const cli = {
   async execute () {
-    for (const option of options) {
-      const commanderStr = optionUsageTag(option) + optionParam(option);
-      if (option.type === 'array') {
-        commander.option(commanderStr, option.describe, collect, []);
-      } else {
-        commander.option(commanderStr, option.describe);
-      }
-    }
-    const parsed = commander.parseOptions(process.argv.slice(2));
-    const args = parsed.operands;
-    if (parsed.unknown.length !== 0) {
-      (commander.parseArgs as (args: string[], unknown: string[]) => void)([], parsed.unknown);
-    }
-    const argv = commander.opts() as Argv;
+    const program = new commander.Command();
+    program
+      .version('0.1.5')
+      .description('Suitable the linters for your style')
+      .option('--eslint-js', 'Use ESlint for JavaScript files')
+      .option('--eslint-ts', 'Use ESLint for TypeScript files')
+      .option('--pmd-java', 'Use PMD for Java files')
+      .option('--pylint', 'Use Pylint for Python files')
+      .option('--generate', 'Generate a config file on the target projects')
+      .helpOption(true)
+      .parse(process.argv);
+    program.parse(process.argv);
+    
+    const args = program.args;
+    const argv = program.opts() as Argv;
     if (args.length < 1) {
         console.error('No target pathes specified.');
         return 2;
@@ -106,36 +59,11 @@ const cli = {
       return 0;
     } else {
       const ruleMap = await lintManager.makeRuleMap();
-      const hiddenRules = ruleMap.getFalseNegative();
-      const unwantedRules = ruleMap.getFalsePositive();
       console.log(ruleMap.makeAddRemovedSummary());
-      const results_length = hiddenRules.length + unwantedRules.length;
+      const results_length = ruleMap.getFalseNegative().length + ruleMap.getFalsePositive().length;
       return results_length === 0 ? 0 : 1;
     }
   }
 };
-
-function collect (val: string, memory: string[]): string[] {
-  memory.push(val);
-
-  return memory;
-}
-
-function optionUsageTag ({ short, name }: Option): string {
-  return short !== undefined ? `-${short}, --${name}` : `--${name}`;
-}
-
-function optionParam (option: Option): string {
-  switch (option.type) {
-    case 'string':
-      return ` [${option.name}]`;
-    case 'array':
-      return ` <${option.name}>`;
-    case 'boolean':
-      return '';
-    default:
-      return '';
-  }
-}
 
 module.exports = cli;
