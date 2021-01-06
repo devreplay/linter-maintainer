@@ -1,6 +1,6 @@
 {
   "name": "linter-maintainer",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Suitable the linters for your style",
   "bin": {
     "linter-maintainer": "./bin/linter-maintainer"
@@ -25,7 +25,7 @@
   "dependencies": {
     "commander": "6.2.1",
     "csv": "^5.3.2",
-    "csv-parse": "4.14.1",
+    "csv-parse": "4.14.2",
     "csv-writer": "^1.6.0",
     "fast-xml-parser": "^3.17.6",
     "eslint": "^7.16.0",
