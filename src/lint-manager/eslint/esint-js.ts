@@ -1,5 +1,5 @@
 import { Result } from 'sarif';
-import {CLIEngine, Linter} from 'eslint';
+import {CLIEngine, Linter } from 'eslint';
 import * as fs from 'fs';
 
 import { RuleMap } from '../rule-map';
@@ -11,36 +11,29 @@ export type Rules = {
     ruleIds: string[]
 }
 
-export function getRulesFromFile (cwd: string): Rules {
-    const configFile = searchConfigFile(cwd);
-    const config: CLIEngine.Options = {
-            cwd,
-            configFile
-        };
-
-    const engine = new CLIEngine(config);
-    const rules = engine.getRules();
+export function getRulesFromFile (cwd: string): string[] {
+    const linter = new Linter({ cwd: cwd });
     const ruleIds: string[] = [];
-    rules.forEach((_rule, key) => {
-        ruleIds.push(key);
+    linter.getRules().forEach((_module, ruleId) => {
+        ruleIds.push(ruleId);
     });
-    return {engine, ruleIds};
+    return ruleIds;
 }
 
-function searchConfigFile (cwd: string): string {
-    const files: string[] = [];
-    fs.readdirSync(cwd).forEach((file) => {
-        if (!file.includes('eslintrc')) {
-            return;
-        }
-        files.push(file);
-    });
+// function searchConfigFile (cwd: string): string {
+//     const files: string[] = [];
+//     fs.readdirSync(cwd).forEach((file) => {
+//         if (!file.includes('eslintrc')) {
+//             return;
+//         }
+//         files.push(file);
+//     });
 
-    if (files.length > 0) {
-        return files[0];
-    }
-    return '';
-}
+//     if (files.length > 0) {
+//         return files[0];
+//     }
+//     return '';
+// }
 
 
 export class ESLintJSManager extends LintManager {
@@ -105,7 +98,7 @@ export class ESLintJSManager extends LintManager {
 
         let enabled: string[];
         try {
-          enabled = getRulesFromFile(this.projectPath).ruleIds;
+          enabled = getRulesFromFile(this.projectPath);
         } catch (error) {
           const defaultrules = this.selectExtends(false);
           enabled = this.getRulesFromExtends(defaultrules).ruleIds;
@@ -134,7 +127,10 @@ export class ESLintJSManager extends LintManager {
         config.extends = extendsName;
     
         const engine = new CLIEngine({'baseConfig': config, 'useEslintrc': false});
+        // const eslint = new ESLint({'baseConfig': config, 'useEslintrc': false});
         const rules = engine.getRules();
+        // const linter = new Linter();
+        // const rules = linter.getRules();
         const ruleIds: string[] = [];
         rules.forEach((_rule, key) => {
             ruleIds.push(key);
