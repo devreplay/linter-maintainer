@@ -1,3 +1,4 @@
+![CI](https://github.com/devreplay/linter-maintainer/workflows/CI/badge.svg)
 # Linter-Maintainer
  
 Suitable the linters for your style
