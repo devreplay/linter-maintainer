@@ -1,10 +1,12 @@
 import { Result } from 'sarif';
 import {CLIEngine, Linter } from 'eslint';
 import * as fs from 'fs';
+import * as path from 'path';
 
 import { RuleMap } from '../rule-map';
 import { LintManager } from '../lint-manager';
 import { getAllFiles } from '../../util';
+import { execSync } from 'child_process';
 
 export type Rules = {
     engine: CLIEngine
@@ -35,6 +37,28 @@ export function getRulesFromFile (cwd: string): string[] {
 //     return '';
 // }
 
+export function getEnabledRules(rootFilePath: string): string[] {
+    const cmd = ['eslint', '--print-config', rootFilePath];
+    const pmdCmd = execSync(cmd.join(' '));
+    const configStr = pmdCmd.toString().trim();
+    const rules = (JSON.parse(configStr) as Linter.Config).rules;
+
+    if (rules === undefined) {
+        throw new Error('Failed to read the ESLint rules');
+    }
+
+    const output = [];
+    for (const key of Object.keys(rules)) {
+        const rule = rules[key];
+        if (rule !== undefined && rule.toString() !== 'off') {
+            output.push(key);
+        } else {
+            console.log(key);
+        }
+    }
+
+    return output;
+}
 
 export class ESLintJSManager extends LintManager {
     engine: CLIEngine;
@@ -42,6 +66,8 @@ export class ESLintJSManager extends LintManager {
     ESAll: string[];
     extension: string;
     config: Linter.BaseConfig<Linter.RulesRecord>;
+    rootFile: string;
+
     constructor (projectPath: string){
         super(projectPath);
         this.ESRecommended = ['eslint:recommended'];
@@ -53,6 +79,7 @@ export class ESLintJSManager extends LintManager {
                 'sourceType': 'module'
             }
         };
+        this.rootFile = path.join(this.projectPath, 'index.js');
         const target_rules = this.selectExtends(true);
         const all_rules = this.getRulesFromExtends(target_rules);
         this.engine = all_rules.engine;
@@ -96,14 +123,14 @@ export class ESLintJSManager extends LintManager {
         const results = await this.execute([]);
         const unfollowed = this.results2warnings(results);
 
-        let enabled: string[];
-        try {
-          enabled = getRulesFromFile(this.projectPath);
-        } catch (error) {
-          const defaultrules = this.selectExtends(false);
-          enabled = this.getRulesFromExtends(defaultrules).ruleIds;
-        }
+        const enabled = getEnabledRules(this.rootFile);
         const ruleMap = new RuleMap(all_rules.ruleIds, unfollowed, enabled);
+        console.log(all_rules.ruleIds.length);
+        console.log(unfollowed.length);
+        console.log(enabled.length);
+        console.log();
+
+
         return new Promise<RuleMap>((resolve) => {
             resolve(ruleMap);
         });

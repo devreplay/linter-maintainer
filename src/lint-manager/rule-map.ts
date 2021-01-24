@@ -71,9 +71,10 @@ export class RuleMap {
 
     const summary = [
       `\n\n${FN.length} rules are available`,
-      `${ FP.length} rules are ignored`,
+      `${FP.length} rules are ignored`,
       `Total: ${FN.length +  FP.length}`,
-      `Accuracy: ${accuracyStr}% Coverage: ${coverageStr}%`
+      `Accuracy: ${accuracyStr}%  (${this.enabled.length - FP.length} / ${this.enabled.length})`,
+      `Coverage: ${coverageStr}% (${this.followed.length - FN.length} / ${this.followed.length})`
     ];
     output += summary.join('\n');
     return output;

@@ -1,4 +1,5 @@
 import { ESLintJSManager } from './esint-js';
+import * as path from 'path';
 
 export class ESLintTSManager extends ESLintJSManager {
     constructor (projectPath: string){
@@ -23,6 +24,7 @@ export class ESLintTSManager extends ESLintJSManager {
             },
             'extends': []
         };
+        this.rootFile = path.join(this.projectPath, 'index.ts');
         const target_rules = this.selectExtends(true);
         const all_rules = this.getRulesFromExtends(target_rules);
         this.engine = all_rules.engine;

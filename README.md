@@ -102,9 +102,9 @@ jobs:
 
 |Language|Tool|command|Validate Rules|Generate Rules|
 |---|---|---|---|---|
-|JavaScript|ESLint|--eslint-js| 🐛 | ✅ |
+|JavaScript|ESLint|--eslint-js| ✅  | ✅ |
 |JavaScript|StandardJS||  |  |
-|TypeScript|ESLint|--eslint-ts| 🐛  | ✅  |
+|TypeScript|ESLint|--eslint-ts| ✅   | ✅  |
 |Java|PMD|--pmd-java| ✅ | ✅ |
 |Java|checkstyle||  |  |
 |Python|Pylint|--pylint|✅|✅|
