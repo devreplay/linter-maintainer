@@ -69,7 +69,8 @@ var options = {
     ignoreAttributes : false,
     parseAttributeValue : true,
 };
-async function correctRules(category, rule_url) {
+
+async function collectRules(category, rule_url) {
 	const rules = []
 	download(rule_url).then(function (content) {
 		try {
@@ -99,7 +100,7 @@ async function executeAll() {
 
 	PMD_CATEGORY.map(x => {
 		return [x, `${pmd_header}/category/java/${x}.xml`];
-	}).forEach((x) => { correctRules(x[0], x[1]) } );
+	}).forEach((x) => { collectRules(x[0], x[1]) } );
 }
 
 function writeRules(rules) {
