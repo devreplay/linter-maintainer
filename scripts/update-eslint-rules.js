@@ -1,7 +1,7 @@
 'use strict';
 /**
- * Collect PMD rules from PMD original source code
- * Link: https://github.com/pmd/pmd/tree/master/pmd-java/src/main/resources/category/java
+ * Collect PMD rules from ESLint original source code
+ * Link: https://github.com/eslint/eslint/blob/main/tools/rule-types.json
  */
 var path = require('path');
 var fs = require('fs');

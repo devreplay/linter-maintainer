@@ -1,4 +1,5 @@
 import * as csvparser from 'csv-parse/lib/sync';
+// TODO node-xml2js に置き換える
 import { validate, parse as xmlparse } from 'fast-xml-parser';
 import { Options } from 'csv-parse';
 import { EOL } from 'os';
