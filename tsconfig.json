@@ -17,7 +17,8 @@
       "lib": ["es6"],
       "rootDir": "./src",
       "outDir": "lib",
-      "resolveJsonModule": true
+      "resolveJsonModule": true,
+      "esModuleInterop": true
   },
   "include": [
     "**/*.ts"

@@ -1,51 +1,24 @@
 import { exec } from 'child_process';
+import { cwd } from 'process';
 import { Result } from 'sarif';
-import { Linter, ESLint } from 'eslint';
+import { Linter } from 'eslint';
 import * as fs from 'fs';
-// import * as path from 'path';
-import { load as yamlLoad } from 'js-yaml';
-
+import * as path from 'path';
+import { dump as yamlDump } from 'js-yaml';
+// import { tryReadFile } from '../../util';
 
 import { rules as allRules } from './rules-js';
 import { RuleMap } from '../rule-map';
 import { LintManager } from '../lint-manager';
-// import { getAllFiles } from '../../util';
 import { execSync } from 'child_process';
 
-// export type Rules = {
-//     engine: CLIEngine
-//     ruleIds: string[]
-// }
-
-// export function getRulesFromFile (cwd: string): string[] {
-//     const linter = new Linter({ cwd: cwd });
-//     const ruleIds: string[] = [];
-//     linter.getRules().forEach((_module, ruleId) => {
-//         ruleIds.push(ruleId);
-//     });
-//     return ruleIds;
-// }
-
-// function searchConfigFile (cwd: string): string {
-//     const files: string[] = [];
-//     fs.readdirSync(cwd).forEach((file) => {
-//         if (!file.includes('eslintrc')) {
-//             return;
-//         }
-//         files.push(file);
-//     });
-
-//     if (files.length > 0) {
-//         return files[0];
-//     }
-//     return '';
-// }
-
 export function getESLintConfig (rootFilePath: string): Linter.Config {
-    const fileConfig = readESLintRC(rootFilePath);
-    if (fileConfig) {
-        return fileConfig;
-    }
+    // find eslintrc file that start with '.eslintrc'
+    // const fileConfig = readESLintRC(rootFilePath);
+    // if (fileConfig) {
+    //     return fileConfig;
+    // }
+    // throw new Error('No eslintrc file found');
     const cmd = ['eslint', '--print-config', rootFilePath];
     const eslintCmd = execSync(cmd.join(' '));
     const configStr = eslintCmd.toString().trim();
@@ -54,21 +27,27 @@ export function getESLintConfig (rootFilePath: string): Linter.Config {
     return config;
 }
 
-function readESLintRC(filePath: string): Linter.Config<Linter.RulesRecord> | undefined {
-    if (filePath.endsWith('.json')) {
-        return JSON.parse(fs.readFileSync(filePath, 'utf8')) as Linter.Config;
-    }
-    else if(filePath.endsWith('.js')) {
-        // TODO: support .eslintrc.js
-        return undefined;
-    }
-    else if (filePath.endsWith('.yaml')) {
-        return yamlLoad(fs.readFileSync(filePath, 'utf8')) as Linter.Config;
-    }
+// function readESLintRC(filePath: string): Linter.Config<Linter.RulesRecord> | undefined {
+//     const contents = tryReadFile(filePath);
+//     if (!contents) {
+//         console.log('fileConfig is empty');
 
-    return undefined;
+//         return undefined;
+//     }
+//     if (filePath.endsWith('.json')) {
+//         return JSON.parse(contents) as Linter.Config;
+//     }
+//     else if(filePath.endsWith('.js')) {
+//         // TODO: support .eslintrc.js
+//         return undefined;
+//     }
+//     else if (filePath.endsWith('.yaml') || filePath.endsWith('.yml')) {
+//         return yamlLoad(contents) as Linter.Config;
+//     }
+
+//     return undefined;
     
-}
+// }
 
 
 function eslintResult2Sarif(eslintResult: string): Result[] {
@@ -98,50 +77,37 @@ function eslintResult2Sarif(eslintResult: string): Result[] {
     return output;
 }
 
-export function getEnabledRules(rootFilePath: string): string[] {
-    const config = getESLintConfig(rootFilePath);
-    const rules = config.rules;
-
-    if (rules === undefined) {
-        throw new Error('Failed to read the ESLint rules');
+function makeESLintCommand(dirName: string, eslintPath: string, rulePath?: string) {
+    const formatkey = ['--format', 'stylish'];
+    const cmd = [eslintPath, dirName, ...formatkey];
+    if (rulePath) {
+        cmd.push(...['--config', rulePath]);
     }
-
-    const output = [];
-    for (const key of Object.keys(rules)) {
-        const rule = rules[key];
-        if (rule !== undefined && rule.toString() !== 'off') {
-            output.push(key);
-        } else {
-            console.log(key);
-        }
-    }
-
-    return output;
+    return  cmd;
 }
 
-function makeESLintCommand(dirName: string, eslintPath: string) {
-    const formatkey = ['--format', 'stylish'];
-    const cmd = [eslintPath, ...formatkey, dirName];
-    return  cmd;
+
+function config2Rules(config: Linter.BaseConfig<Linter.RulesRecord>) {
+    const rules = config.rules;
+    if (rules) {
+        return new Promise<string[]>((resolve) => {
+            resolve(Object.keys(rules));
+        });
+    } else {
+        return new Promise<string[]>((_resolve, reject) => {
+            reject('no rules');
+        });
+    }
 }
 
 export class ESLintJSManager extends LintManager {
     eslintPath: string;
-    extension: string;
     config: Linter.BaseConfig<Linter.RulesRecord>;
-    linter: Linter;
 
-    constructor (projectPath: string, eslintPath?: string, configPath?: string) {
+    constructor (projectPath: string, eslintPath?: string) {
         super(projectPath);
         this.eslintPath = eslintPath? eslintPath: 'eslint';
-        this.extension = '.js';
-        if (configPath) {
-            this.config = getESLintConfig(configPath);
-        } else {
-            this.config = getESLintConfig(this.projectPath);
-        }
-        this.linter = new Linter({ cwd: this.projectPath });
-        // this.engine = new ESLint({baseConfig: this.config, useEslintrc: false});
+        this.config = getESLintConfig(this.projectPath);
     }
 
     execute (cmd: string[]): Promise<Result[]> {
@@ -171,53 +137,71 @@ export class ESLintJSManager extends LintManager {
     }
 
     getAvailableRules(): Promise<string[]> {
+        // const allRuleConfig = this.makeAllRuleConfig();
         return new Promise<string[]>((resolve) => {
             resolve(allRules);
         });
     }
 
-    removeFalsePositiveRules(): string[] {
-        // 誤検出ルールを削除する
-        return [];
-    }
-
-    addFalseNegativeRules(): string[] {
-        // 検出漏れルールを追加する
-        return [];
-    }
-
-    async makeRuleMap (): Promise<RuleMap> {
-        // 新しいconfigファイルを作る
-        // それを読み込んでESLintで実行する
-        
-        // 現在のESLintのルールを読み込む
-        // 
-
-
+    /**
+     * 誤検出ルールを特定する
+     */
+    async getFalsePositive() {
+        // 現在の状態で実行する
         const command = makeESLintCommand(this.projectPath, this.eslintPath);
 
         const results = await this.execute(command);
         const unfollowed = this.results2warnings(results);
-        // const rules: Partial<Linter.RulesRecord> | undefined = this.config.rules;
-        this.config.extends = this.addExtends2AllRules(this.config.extends);
-        // const ruleIDs: string[] = [];
+        return unfollowed;
+    }
 
-        // if (rules) {
-        //     for (const key of Object.keys(rules)) {
-        //         const rule = rules[key];
-        //         if (rule !== undefined && rule.toString() !== 'off') {
-        //             ruleIDs.push(key);
-        //         }
-        //     }
+    /**
+     * 検出漏れルールを特定する
+     */
+    async getFalseNegative() {
+        const allRulesConfig = this.makeAllRuleConfig();
+        const allRulesContents = `${yamlDump(allRulesConfig, undefined)}\n`;
+        const allRulesJsonPath = path.join(cwd(), '.eslintrc_all.yaml');
+        fs.writeFileSync(allRulesJsonPath, allRulesContents);
+
+        const command = makeESLintCommand(this.projectPath, this.eslintPath, allRulesJsonPath);
+        const results = await this.execute(command);
+        fs.unlinkSync(allRulesJsonPath);
+        const unfollowed = this.results2warnings(results);
+
+
+        const enabled = await config2Rules(this.config);
+        const allRules = await config2Rules(allRulesConfig);
+
+        return allRules.filter(rule => !enabled.includes(rule) && !unfollowed.includes(rule));
+    }
+
+    async makeRuleMap (): Promise<RuleMap> {
+        const allRulesConfig = this.makeAllRuleConfig();
+        const allRulesContents = `${yamlDump(allRulesConfig, undefined)}\n`;
+        const allRulesJsonPath = path.join(cwd(), '.eslintrc_all.yaml');
+        fs.writeFileSync(allRulesJsonPath, allRulesContents);
+
+        const command = makeESLintCommand(this.projectPath, this.eslintPath, allRulesJsonPath);
+        const results = await this.execute(command);
+        // fs.unlinkSync(allRulesJsonPath);
+        const unfollowed = this.results2warnings(results);
+
+        const enabled = await config2Rules(this.config);
+        // const reloadedAllRulesConfig = getESLintConfig(allRulesJsonPath);
+
+        // if (reloadedAllRulesConfig) {
+        //     const allRules = await config2Rules(reloadedAllRulesConfig);
+        //     // console.log(allRules);
+        //     fs.unlinkSync(allRulesJsonPath);
+
+        //     return new RuleMap(allRules, unfollowed, enabled);
         // }
 
-        // const enabled = getEnabledRules(this.rootFile);
-        const rules = this.linter.getRules();
-        const ruleMap = new RuleMap(allRules, unfollowed, enabled);
-
-        return new Promise<RuleMap>((resolve) => {
-            resolve(ruleMap);
-        });
+        fs.unlinkSync(allRulesJsonPath);
+        console.log(allRules.length, unfollowed.length, enabled.length);
+        return new RuleMap(allRules, unfollowed, enabled);
+        // throw new Error('failed to reload all rules');   
     }
 
     rules2config(rules: string[]): string {
@@ -229,26 +213,26 @@ export class ESLintJSManager extends LintManager {
         );
     
         config.rules = newRule;
-        const content = `${JSON.stringify(config, undefined, 2)}\n`;
+        const content = `${yamlDump(config, undefined)}\n`;
         return content;
     }
 
-    addExtends2AllRules(extendsRules: string | string[] | undefined): string[] {
-        if (extendsRules === undefined) {
-            return ['eslint:all'];
-        } else if (typeof extendsRules === 'string') {
-            return ['eslint:all', extendsRules];
-        } else {
-            return ['eslint:all', ...extendsRules];
+    makeAllRuleConfig() {
+        const config = this.config;
+
+        // if (config.extends === undefined) {
+        //     config.extends = ['eslint:all'];
+        // } else if (typeof config.extends === 'string') {
+        //     config.extends = ['eslint:all', config.extends];
+        // } else {
+        //     config.extends = ['eslint:all', ...config.extends];
+        // }
+        for (const rule of allRules) {
+            if (!config.rules) {
+                config.rules = {};
+            }
+            config.rules[rule] = 'error';
         }
+        return config;
     }
-    // getRulesFromExtends (): string[] {
-    //     const linter = new Linter();
-    //     const rules = linter.getRules();
-    //     const ruleIds: string[] = [];
-    //     rules.forEach((_rule, key) => {
-    //         ruleIds.push(key);
-    //     });
-    //     return ruleIds;
-    // }
 }

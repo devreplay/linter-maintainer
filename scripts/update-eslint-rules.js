@@ -80,4 +80,15 @@ async function collectRules(rule_url) {
 	})
 }
 
+function copyTSRules(rule_url) {
+	download(rule_url).then(function (content) {
+		try {
+			const rulePath = `src/lint-manager/eslint/rules-ts.ts`
+			fs.writeFileSync(rulePath, content);
+			console.log('Updated ' + path.basename(rulePath));
+		} catch(e) { console.log(e) }
+	})
+}
+
 collectRules('https://raw.githubusercontent.com/eslint/eslint/master/tools/rule-types.json');
+copyTSRules('https://raw.githubusercontent.com/typescript-eslint/typescript-eslint/main/packages/eslint-plugin/src/configs/all.ts')

@@ -3,11 +3,11 @@ import * as csv from 'csv';
 import * as fs from 'fs';
 
 export class RuleMap {
-  all: string[]
-  followed: string[]
-  unfollowed: string[]
-  enabled: string[]
-  disabled: string[]
+  all: string[];
+  followed: string[];
+  unfollowed: string[];
+  enabled: string[];
+  disabled: string[];
 
   constructor (
     all: string[],
