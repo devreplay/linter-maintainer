@@ -1,4 +1,4 @@
-import { parse } from 'csv-parse/lib/sync';
+import { parse } from 'csv-parse/sync';
 import * as xml2js from 'xml2js';
 import { Options } from 'csv-parse';
 import { EOL } from 'os';
@@ -17,7 +17,9 @@ interface PmdConfig {
   ruleset: {
     description: string
     rule: {
-      ref: string
+      $: {
+        ref: string
+      }
     }[]
   }
 }
@@ -96,7 +98,7 @@ async function collectRuleIdfromXML(xmlPath:string) {
   const config = await readConfig(xmlPath);
   const rules = [];
   for (const rule of config.ruleset.rule) {
-    rules.push(rule.ref);
+    rules.push(rule.$.ref);
   }
   return rules;
 }
@@ -183,6 +185,7 @@ export class PMDManager extends LintManager {
     const all = await this.getAvailableRules();
     const unfollowed = this.results2warnings(results);
     const enabled = this.configPath? await collectRuleIdfromXML(this.configPath): [];
+    // console.log(enabled);
     return new RuleMap(all, unfollowed, enabled.map(x => makeShortRuleID(x)));
   }
 
