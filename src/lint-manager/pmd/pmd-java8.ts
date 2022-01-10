@@ -1,6 +1,5 @@
-import * as csvparser from 'csv-parse/lib/sync';
-// TODO node-xml2js に置き換える
-import { validate, parse as xmlparse } from 'fast-xml-parser';
+import { parse } from 'csv-parse/lib/sync';
+import * as xml2js from 'xml2js';
 import { Options } from 'csv-parse';
 import { EOL } from 'os';
 import { exec } from 'child_process';
@@ -52,14 +51,14 @@ export function parsePmdCsv(csv: string): Array<PmdResult> {
     relax_column_count: true,
   };
   try {
-    results = csvparser(csv, parseOpts) as PmdResult[];
+    results = parse(csv, parseOpts) as PmdResult[];
   } catch (e) {
     //try to recover parsing... remove last ln and try again
     const lines = csv.split(EOL);
     lines.pop();
     csv = lines.join(EOL);
     try {
-      results = csvparser(csv, parseOpts) as PmdResult[];
+      results = parse(csv, parseOpts) as PmdResult[];
     } catch (e) {
       throw new Error(
         'Failed to parse PMD Results.  Enable please logging (STDOUT & STDERROR) and submit an issue if this problem persists.'
@@ -70,7 +69,7 @@ export function parsePmdCsv(csv: string): Array<PmdResult> {
 }
 
 
-function readConfig(xmlPath:string): PmdConfig {
+function readConfig(xmlPath:string): Promise<PmdConfig> {
     // xmlを開く
     const contents = tryReadFile(xmlPath);
     if (contents === undefined) {
@@ -78,30 +77,23 @@ function readConfig(xmlPath:string): PmdConfig {
         'Failed to read PMD Config.'
       );
     }
-    const options = {
-      attributeNamePrefix : '',
-      ignoreAttributes : false,
-      parseAttributeValue : true,
-    };
-    if(validate(contents) === true) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      try {
-        const jsonObj = xmlparse(contents, options) as PmdConfig;
-        return jsonObj;
-      } catch (error) {
-        throw new Error(
-          'Failed to parse PMD Config.'
-        );
-      }
-    }
-    throw new Error(
-      'Failed to parse PMD Config as XML.'
-    );
+
+    return new Promise<PmdConfig>(
+      (resolve: (value: PmdConfig) => void, reject: (e: Error) => void): void => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      xml2js.parseString(contents, (err: Error, result: any) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result as PmdConfig);
+        }
+      });
+    });
 }
 
 
-function collectRuleIdfromXML(xmlPath:string) {
-  const config = readConfig(xmlPath);
+async function collectRuleIdfromXML(xmlPath:string) {
+  const config = await readConfig(xmlPath);
   const rules = [];
   for (const rule of config.ruleset.rule) {
     rules.push(rule.ref);
@@ -190,7 +182,7 @@ export class PMDManager extends LintManager {
 
     const all = await this.getAvailableRules();
     const unfollowed = this.results2warnings(results);
-    const enabled = this.configPath? collectRuleIdfromXML(this.configPath): [];
+    const enabled = this.configPath? await collectRuleIdfromXML(this.configPath): [];
     return new RuleMap(all, unfollowed, enabled.map(x => makeShortRuleID(x)));
   }
 
