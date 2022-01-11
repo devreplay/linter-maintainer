@@ -1,5 +1,5 @@
 import { exec } from 'child_process';
-import { cwd } from 'process';
+// import { cwd } from 'process';
 import { Result } from 'sarif';
 import { Linter } from 'eslint';
 import * as fs from 'fs';
@@ -145,7 +145,8 @@ export class ESLintJSManager extends LintManager {
     async getFalseNegative() {
         const config = getESLintConfig(this.projectPath);
         const allRulesConfig = await this.makeAllRuleConfig(config);
-        const allRulesJsonPath = path.join(cwd(), '.eslintrc_all.yaml');
+        const configDir = path.dirname(path.resolve(this.projectPath));
+        const allRulesJsonPath = path.join(configDir, '.eslintrc_all.yaml');
         const allRulesContents = config2String(allRulesConfig, allRulesJsonPath);
         fs.writeFileSync(allRulesJsonPath, allRulesContents);
 
@@ -187,7 +188,8 @@ export class ESLintJSManager extends LintManager {
         const config = getESLintConfig(this.projectPath);
         const allRulesConfig = await this.makeAllRuleConfig(config);
         const allRulesContents = `${yamlDump(allRulesConfig, undefined)}\n`;
-        const allRulesJsonPath = path.join(cwd(), '.eslintrc_all.yaml');
+        const configDir = path.dirname(path.resolve(this.projectPath));
+        const allRulesJsonPath = path.join(configDir, '.eslintrc_all.yaml');
         fs.writeFileSync(allRulesJsonPath, allRulesContents);
 
         const command = makeESLintCommand(path.dirname(this.projectPath), this.eslintPath, allRulesJsonPath);
