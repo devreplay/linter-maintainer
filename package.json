@@ -1,6 +1,6 @@
 {
   "name": "linter-maintainer",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Suitable the linters for your style",
   "bin": {
     "linter-maintainer": "./bin/linter-maintainer"

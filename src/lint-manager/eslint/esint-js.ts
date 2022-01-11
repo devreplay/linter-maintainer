@@ -66,6 +66,7 @@ function makeESLintCommand(dirName: string, eslintPath: string, rulePath?: strin
     if (rulePath) {
         cmd.push(...['--config', rulePath]);
     }
+    console.log(cmd.join(' '));
     return  cmd;
 }
 
