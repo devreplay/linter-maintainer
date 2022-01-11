@@ -53,25 +53,19 @@ export function getESLintConfig (rootFilePath: string): Linter.Config {
 function eslintResult2Sarif(eslintResult: string): Result[] {
     const output: Result[] = [];
 
-    const fileRegExp = /^([^\\s].*)$/gm;
-    const ruleRegExp = /^\\s+(\\d+):(\\d+)\\s+(error|warning|info)\\s+(.*)\\s\\s+(.*)$/gm;
+    // const fileRegExp = /^([^\\s].*)$/gm;
+    const ruleRegExp = /^\s+(\d+):(\d+)\s+(error|warning|info)\s+(.*)\s\s+(.*)$/gm;
 
     let match: RegExpExecArray | null;
 
 
-    // read ESresult by one line
     for (const line of eslintResult.split('\n')) {
-        const fileMatch = fileRegExp.exec(line);
-        if (fileMatch) {
-            continue;
-        } else {
-            while ((match = ruleRegExp.exec(line)) !== null) {
-                const result: Result = {
-                    message: { text: match[4] },
-                    ruleId: match[5],
-                };
-                output.push(result);
-            }
+        while ((match = ruleRegExp.exec(line)) !== null) {
+            const result: Result = {
+                message: { text: match[4].toString() },
+                ruleId: match[5].toString(),
+            };
+            output.push(result);
         }
     }
     return output;
@@ -91,7 +85,9 @@ function config2Rules(config: Linter.BaseConfig<Linter.RulesRecord>) {
     const rules = config.rules;
     if (rules) {
         return new Promise<string[]>((resolve) => {
-            resolve(Object.keys(rules));
+            // remove rules that are 'off'
+            const enabledRules = Object.keys(rules).filter(rule => rules[rule] !== 'off' && rules[rule] !== ['off']);
+            resolve(enabledRules);
         });
     } else {
         return new Promise<string[]>((_resolve, reject) => {
@@ -148,7 +144,7 @@ export class ESLintJSManager extends LintManager {
      */
     async getFalsePositive() {
         // 現在の状態で実行する
-        const command = makeESLintCommand(this.projectPath, this.eslintPath);
+        const command = makeESLintCommand(path.dirname(this.projectPath), this.eslintPath);
 
         const results = await this.execute(command);
         const unfollowed = this.results2warnings(results);
@@ -159,12 +155,12 @@ export class ESLintJSManager extends LintManager {
      * 検出漏れルールを特定する
      */
     async getFalseNegative() {
-        const allRulesConfig = this.makeAllRuleConfig();
+        const allRulesConfig = await this.makeAllRuleConfig();
         const allRulesContents = `${yamlDump(allRulesConfig, undefined)}\n`;
         const allRulesJsonPath = path.join(cwd(), '.eslintrc_all.yaml');
         fs.writeFileSync(allRulesJsonPath, allRulesContents);
 
-        const command = makeESLintCommand(this.projectPath, this.eslintPath, allRulesJsonPath);
+        const command = makeESLintCommand(path.dirname(this.projectPath), this.eslintPath, allRulesJsonPath);
         const results = await this.execute(command);
         fs.unlinkSync(allRulesJsonPath);
         const unfollowed = this.results2warnings(results);
@@ -177,31 +173,19 @@ export class ESLintJSManager extends LintManager {
     }
 
     async makeRuleMap (): Promise<RuleMap> {
-        const allRulesConfig = this.makeAllRuleConfig();
+        const allRulesConfig = await this.makeAllRuleConfig();
         const allRulesContents = `${yamlDump(allRulesConfig, undefined)}\n`;
         const allRulesJsonPath = path.join(cwd(), '.eslintrc_all.yaml');
         fs.writeFileSync(allRulesJsonPath, allRulesContents);
 
-        const command = makeESLintCommand(this.projectPath, this.eslintPath, allRulesJsonPath);
+        const command = makeESLintCommand(path.dirname(this.projectPath), this.eslintPath, allRulesJsonPath);
         const results = await this.execute(command);
-        // fs.unlinkSync(allRulesJsonPath);
         const unfollowed = this.results2warnings(results);
-
         const enabled = await config2Rules(this.config);
-        // const reloadedAllRulesConfig = getESLintConfig(allRulesJsonPath);
+        console.log((await this.getAvailableRules()).length, unfollowed.length, enabled.length);
+        console.log((await this.getAvailableRules()));
+        return new RuleMap(await this.getAvailableRules(), unfollowed, enabled);
 
-        // if (reloadedAllRulesConfig) {
-        //     const allRules = await config2Rules(reloadedAllRulesConfig);
-        //     // console.log(allRules);
-        //     fs.unlinkSync(allRulesJsonPath);
-
-        //     return new RuleMap(allRules, unfollowed, enabled);
-        // }
-
-        fs.unlinkSync(allRulesJsonPath);
-        console.log(allRules.length, unfollowed.length, enabled.length);
-        return new RuleMap(allRules, unfollowed, enabled);
-        // throw new Error('failed to reload all rules');   
     }
 
     rules2config(rules: string[]): string {
@@ -217,21 +201,19 @@ export class ESLintJSManager extends LintManager {
         return content;
     }
 
-    makeAllRuleConfig() {
+    async makeAllRuleConfig() {
         const config = this.config;
-
-        // if (config.extends === undefined) {
-        //     config.extends = ['eslint:all'];
-        // } else if (typeof config.extends === 'string') {
-        //     config.extends = ['eslint:all', config.extends];
-        // } else {
-        //     config.extends = ['eslint:all', ...config.extends];
-        // }
-        for (const rule of allRules) {
+        for (const rule of (await this.getAvailableRules())) {
             if (!config.rules) {
                 config.rules = {};
             }
-            config.rules[rule] = 'error';
+            if (config.rules[rule]) {
+                if (config.rules[rule] !== 'off' && config.rules[rule] !== ['off']) {
+                    config.rules[rule] = 'error';
+                }
+            } else {
+                config.rules[rule] = 'error';
+            }
         }
         return config;
     }

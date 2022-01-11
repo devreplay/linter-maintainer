@@ -1,5 +1,5 @@
 import { ESLintJSManager } from './esint-js';
-import { rules } from './rules-ts';
+import { rules as allRules } from './rules-ts';
 
 export class ESLintTSManager extends ESLintJSManager {
     constructor (projectPath: string){
@@ -9,13 +9,7 @@ export class ESLintTSManager extends ESLintJSManager {
     getAvailableRules(): Promise<string[]> {
         // const allRuleConfig = this.makeAllRuleConfig();
         return new Promise<string[]>((resolve) => {
-            resolve(Object.keys(rules));
+            resolve(allRules);
         });
-    }
-
-    makeAllRuleConfig() {
-        const config = this.config;
-
-        return config;
     }
 }

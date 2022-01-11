@@ -84,7 +84,16 @@ function copyTSRules(rule_url) {
 	download(rule_url).then(function (content) {
 		try {
 			const rulePath = `src/lint-manager/eslint/rules-ts.ts`
-			fs.writeFileSync(rulePath, content);
+			// read content by one line
+			const lines = content.split('\n')
+			// get line that includes '@typescript-eslint/'
+			const tsLines = lines.filter(line => line.includes('@typescript-eslint/'))
+			// remove 'error' and spaces from each line ends
+			const tsRules = tsLines.map(line => line.replace(': \'error\',', ''))
+			let output = 'export const rules: string[] = [\n'
+			output += tsRules.join(',\n')
+			output += '];'
+			fs.writeFileSync(rulePath, output);
 			console.log('Updated ' + path.basename(rulePath));
 		} catch(e) { console.log(e) }
 	})
