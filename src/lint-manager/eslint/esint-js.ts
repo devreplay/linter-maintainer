@@ -135,7 +135,7 @@ export class ESLintJSManager extends LintManager {
     }
 
     async getFalsePositive() {
-        const command = makeESLintCommand(path.dirname(this.projectPath), this.eslintPath);
+        const command = makeESLintCommand(path.dirname(path.resolve(this.projectPath)), this.eslintPath);
 
         const results = await this.execute(command);
         const unfollowed = this.results2warnings(results);
@@ -150,7 +150,7 @@ export class ESLintJSManager extends LintManager {
         const allRulesContents = config2String(allRulesConfig, allRulesJsonPath);
         fs.writeFileSync(allRulesJsonPath, allRulesContents);
 
-        const command = makeESLintCommand(path.dirname(this.projectPath), this.eslintPath, allRulesJsonPath);
+        const command = makeESLintCommand(configDir, this.eslintPath, allRulesJsonPath);
         const results = await this.execute(command);
         fs.unlinkSync(allRulesJsonPath);
         const unfollowed = this.results2warnings(results);
@@ -192,7 +192,7 @@ export class ESLintJSManager extends LintManager {
         const allRulesJsonPath = path.join(configDir, '.eslintrc_all.yaml');
         fs.writeFileSync(allRulesJsonPath, allRulesContents);
 
-        const command = makeESLintCommand(path.dirname(this.projectPath), this.eslintPath, allRulesJsonPath);
+        const command = makeESLintCommand(configDir, this.eslintPath, allRulesJsonPath);
         const results = await this.execute(command);
         fs.unlinkSync(allRulesJsonPath);
 
