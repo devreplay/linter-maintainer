@@ -1,6 +1,6 @@
 {
   "name": "linter-maintainer",
-  "version": "0.1.7",
+  "version": "0.2.0",
   "description": "Suitable the linters for your style",
   "bin": {
     "linter-maintainer": "./bin/linter-maintainer"
@@ -24,15 +24,15 @@
     "verify": "npm-run-all clean compile"
   },
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.9.0",
-    "@typescript-eslint/parser": "^5.9.0",
+    "@typescript-eslint/eslint-plugin": "^5.9.1",
+    "@typescript-eslint/parser": "^5.9.1",
     "commander": "8.3.0",
     "csv": "^6.0.5",
     "csv-parse": "5.0.4",
     "csv-writer": "^1.6.0",
     "eslint": "^8.6.0",
     "eslint-plugin-import": "^2.25.4",
-    "eslint-plugin-jsdoc": "^37.5.1",
+    "eslint-plugin-jsdoc": "^37.6.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.0.0",
     "js-yaml": "^4.1.0",
