@@ -95,12 +95,11 @@ function config2Rules(config: Linter.BaseConfig<Linter.RulesRecord>) {
 
 export class ESLintJSManager extends LintManager {
     eslintPath: string;
-    config: Linter.BaseConfig<Linter.RulesRecord>;
+    // config: Linter.BaseConfig<Linter.RulesRecord>;
 
     constructor (projectPath: string, eslintPath?: string) {
         super(projectPath);
         this.eslintPath = eslintPath? eslintPath: 'eslint';
-        this.config = getESLintConfig(this.projectPath);
     }
 
     execute (cmd: string[]): Promise<Result[]> {
@@ -144,7 +143,8 @@ export class ESLintJSManager extends LintManager {
     }
 
     async getFalseNegative() {
-        const allRulesConfig = await this.makeAllRuleConfig();
+        const config = getESLintConfig(this.projectPath);
+        const allRulesConfig = await this.makeAllRuleConfig(config);
         const allRulesJsonPath = path.join(cwd(), '.eslintrc_all.yaml');
         const allRulesContents = config2String(allRulesConfig, allRulesJsonPath);
         fs.writeFileSync(allRulesJsonPath, allRulesContents);
@@ -155,7 +155,7 @@ export class ESLintJSManager extends LintManager {
         const unfollowed = this.results2warnings(results);
 
 
-        const enabled = await config2Rules(this.config);
+        const enabled = await config2Rules(config);
         const allRules = await config2Rules(allRulesConfig);
 
         return allRules.filter(rule => !enabled.includes(rule) && !unfollowed.includes(rule));
@@ -184,7 +184,8 @@ export class ESLintJSManager extends LintManager {
     }
 
     async makeRuleMap (): Promise<RuleMap> {
-        const allRulesConfig = await this.makeAllRuleConfig();
+        const config = getESLintConfig(this.projectPath);
+        const allRulesConfig = await this.makeAllRuleConfig(config);
         const allRulesContents = `${yamlDump(allRulesConfig, undefined)}\n`;
         const allRulesJsonPath = path.join(cwd(), '.eslintrc_all.yaml');
         fs.writeFileSync(allRulesJsonPath, allRulesContents);
@@ -194,7 +195,7 @@ export class ESLintJSManager extends LintManager {
         fs.unlinkSync(allRulesJsonPath);
 
         const unfollowed = this.results2warnings(results);
-        const enabled = await config2Rules(this.config);
+        const enabled = await config2Rules(config);
 
         return new RuleMap(await this.getAvailableRules(), unfollowed, enabled);
     }
@@ -203,8 +204,7 @@ export class ESLintJSManager extends LintManager {
         return this.enableRules(rules, this.projectPath);
     }
 
-    async makeAllRuleConfig() {
-        const config = this.config;
+    async makeAllRuleConfig(config: Linter.BaseConfig<Linter.RulesRecord>) {
         for (const rule of (await this.getAvailableRules())) {
             if (!config.rules) {
                 config.rules = {};
