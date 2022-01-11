@@ -1,4 +1,4 @@
-import { exec } from 'child_process';
+import { execSync, exec } from 'child_process';
 // import { cwd } from 'process';
 import { Result } from 'sarif';
 import { Linter } from 'eslint';
@@ -10,11 +10,10 @@ import { tryReadFile } from '../../util';
 import { rules as allRules } from './rules-js';
 import { RuleMap } from '../rule-map';
 import { LintManager } from '../lint-manager';
-import { execSync } from 'child_process';
 
 function getESLintConfig (rootFilePath: string): Linter.Config {
     const cmd = ['eslint', '--print-config', rootFilePath];
-    const eslintCmd = execSync(cmd.join(' '));
+    const eslintCmd = execSync(cmd.join(' '), { cwd: path.resolve(path.dirname(rootFilePath)) });
     const configStr = eslintCmd.toString().trim();
     const config = JSON.parse(configStr) as Linter.Config;
 
@@ -105,7 +104,7 @@ export class ESLintJSManager extends LintManager {
 
     execute (cmd: string[]): Promise<Result[]> {
         let result: Result[] = [];
-        const eslintCmd = exec(cmd.join(' '), {});
+        const eslintCmd = exec(cmd.join(' '), { cwd: path.resolve(path.dirname(this.projectPath)) });
         const eslintPromise = new Promise<Result[]>((resolve, reject) => {
           eslintCmd.addListener('error', (e) => {
             console.error(e);
